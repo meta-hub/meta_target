@@ -268,6 +268,9 @@ RegisterNUICallback('closed',function()
 end)
 
 RegisterNUICallback('select',function(data)
+  data.id     = tonumber(data.id)
+  data.index  = tonumber(data.index)+1
+  
   local target = activeTargets[data.id]
 
   if not target then
@@ -574,68 +577,3 @@ end
 exports('getExportNames',function()
   return exportNames
 end)
-
--- local control1 = Controls.Get("MeleeBlock")
--- local control2 = Controls.Get("MeleeAttack")
--- local pg = Prompts.NewGroup('Barrel')
-
--- local pos = vector3(-296.58,786.14,118.33)
--- local isPressing = false
-
--- Prompts.NewPrompt(
---   'Drink',
---   control1,
---   true,
---   pg,
---   function()
---   end
--- )
-
--- local start = GetGameTimer()
--- local isActive
--- local isShown
-
--- while true do
---   local dist = #(GetEntityCoords(PlayerPedId()) - pos)
---   if dist <= 5.0 then
---     if not isActive then
---       isActive = true
---       TaskLookAtCoord(PlayerPedId(),pos.x,pos.y,pos.z,-1,true,true)
---       SetGameplayCoordHint(pos.x,pos.y,pos.z, -1, 1000, 1000, 0)
---     end
-
---     if dist <= 2.0 then
---       if not isShown then
---         isShown = true
---         pg:show()
---       end
---     else
---       if isShown then
---         isShown = false
---         pg:hide()
---       end
---     end
---   else
---     if isActive then
---       isShown = false
---       isActive = false
---       StopGameplayHint(true)
---       TaskClearLookAt(PlayerPedId())
---       pg:hide()
---     end
---   end
-
---   Wait(0)
--- end
-
--- TaskClearLookAt(PlayerPedId())
-
--- pg:hide()
-
--- RegisterCommand('toggleui',function()
---   if not isOpen then
---     openUi()
---   else
---     closeUi()
---   end
--- end)  

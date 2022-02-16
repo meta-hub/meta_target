@@ -187,10 +187,20 @@
         const items = createEle('DIV','items',titleContainer)
 
         for (let j=0;j<target.items.length;j++) {
-          const item = target.items[j]
+          const index = j
+          const item = target.items[index]
 
           const label = createEle('DIV','label',items)
           label.textContent = item.label
+
+          label.onclick = function() {
+            const payload = {
+              id:target.id,
+              index:index
+            }
+
+            $.post(`https://${GetParentResourceName()}/select`,JSON.stringify(payload))
+          }
         }
       }      
     }
@@ -219,7 +229,10 @@
     })
 
     window.addEventListener('keyup',function(e) {
-      console.log(e.key)
+      if (e.key == "ESCAPE" || e.key == "escape" || e.key == "ESC" || e.key == "esc") {
+        document.body.style.opacity = 0        
+        $.post(`https://${GetParentResourceName()}/closed`)
+      }
     })
   </script>
 </body>

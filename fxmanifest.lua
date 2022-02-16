@@ -7,21 +7,14 @@ use_fxv2_oal 'yes'
 
 ui_page 'nui/index.html'
 
-client_scripts {
-  '@redm-ulib/lib/matrix.lua',
-  '@redm-ulib/lib/s2w.lua',
-  '@redm-ulib/lib/controls.lua',
-  '@redm-ulib/lib/playerdata.lua',
-  
+client_scripts {  
   '@PolyZone/client.lua',
   '@PolyZone/BoxZone.lua',
-  '@PolyZone/EntityZone.lua',
-  '@PolyZone/CircleZone.lua',
-  '@PolyZone/ComboZone.lua',
 
   'config.lua',
+  'client/s2w.lua',
+  'client/controls.lua',
   'client/main.lua',
-
 }
 
 files {
@@ -30,6 +23,5 @@ files {
 }
 
 dependencies {
-  'redm-ulib',
   'PolyZone'
 }

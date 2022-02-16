@@ -8,8 +8,10 @@ use_fxv2_oal 'yes'
 ui_page 'nui/index.html'
 
 client_scripts {
+  '@redm-ulib/lib/matrix.lua',
   '@redm-ulib/lib/s2w.lua',
   '@redm-ulib/lib/controls.lua',
+  '@redm-ulib/lib/playerdata.lua',
   
   '@PolyZone/client.lua',
   '@PolyZone/BoxZone.lua',
@@ -20,11 +22,11 @@ client_scripts {
   'config.lua',
   'client/main.lua',
 
-  'lib/target.lua'
 }
 
 files {
-  'nui/index.html'
+  'nui/index.html',
+  'lib/target.lua'
 }
 
 dependencies {

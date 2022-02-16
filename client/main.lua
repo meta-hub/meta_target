@@ -195,11 +195,10 @@ end
 
 local function checkActiveTargets()
   local pos = GetEntityCoords(PlayerPedId())
-  local hit,endCoords,entityHit = s2w.get()
+  local hit,endCoords,entityHit = s2w.get(-1,PlayerPedId(),0)
   local entityModel,netId,isNetworked = false,false,false
 
-  if isEntityValid(entityHit) then
-    entityHit   = false
+  if isEntityValid(entityHit) and GetEntityType(entityHit) ~= 0 then
     entityModel = GetEntityModel(entityHit)%0x100000000
     isNetworked = NetworkGetEntityIsNetworked(entityHit)
 
@@ -235,30 +234,28 @@ local function checkActiveTargets()
 end
 
 Citizen.CreateThread(function()
-  local control = Controls.Get("HudSpecial")
-
-  while not PlayerData.Get('character') do
-    Wait(100)
-  end
+  local control       = Controls.Get("HudSpecial")
+  local revealControl = Controls.Get("RevealHud")
+  local radarControl  = Controls.Get("SelectRadarMode")
 
   while true do
     Wait(0)
 
-    Controls.DisableKey(control)
-    Controls.DisableKey(0xCF8A4ECA)
-    Controls.DisableKey(0x0F39B3D4)
+    DisableControlAction(0,control)
+    DisableControlAction(0,revealControl)
+    DisableControlAction(0,radarControl)
 
     if isOpen then
-      if Controls.GetDisabledKeyReleased(control)
-      or Controls.GetKeyReleased(control) 
+      if IsDisabledControlJustReleased(0,control)
+      or IsControlJustPressed(0,control) 
       then
         closeUi()
       end
 
       checkActiveTargets()
     else
-      if Controls.GetDisabledKeyPressed(control)
-      or Controls.GetKeyPressed(control) 
+      if IsDisabledControlJustPressed(0,control)
+      or IsControlJustPressed(0,control) 
       then
         openUi()
       end
@@ -413,7 +410,7 @@ local apiFunctions = {
   ['addModels'] = function(...)
     local id,title,icon,models,radius,onSelect,items,vars = evalArgs({'id','title','icon','models','radius','onSelect','items','vars'},...)
 
-    for i=1,#,models do
+    for i=1,#models do
       addModel(id .. ":" .. i,title,icon,models[i],radius,onSelect,items,vars)
     end
   end,
@@ -539,7 +536,7 @@ local apiFunctions = {
   ['addNetEntBones'] = function(...)
     local id,title,icon,netId,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','netId','bones','radius','onSelect','items','vars'},...)
 
-    for i=1,#,bones do
+    for i=1,#bones do
       addNetEntBone(id .. ":" .. i,title,icon,netId,bones[i],radius,onSelect,items,vars)
     end
   end,
@@ -549,7 +546,7 @@ local apiFunctions = {
   ['addLocalEntBones'] = function(...)
     local id,title,icon,entId,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','entId','bones','radius','onSelect','items','vars'},...)
 
-    for i=1,#,bones do
+    for i=1,#bones do
       addLocalEntBone(id .. ":" .. i,title,icon,entId,bones[i],radius,onSelect,items,vars)
     end
   end,
@@ -559,7 +556,7 @@ local apiFunctions = {
   ['addModelBones'] = function(...)
     local id,title,icon,model,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','model','bones','radius','onSelect','items','vars'},...)
 
-    for i=1,#,bones do
+    for i=1,#bones do
       addModelBone(id .. ":" .. i,title,icon,model,bones[i],radius,onSelect,items,vars)
     end
   end,

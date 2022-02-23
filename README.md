@@ -1,4 +1,8 @@
-# redm-target
+# meta-target
+
+## Installation:  
+Add the `meta-target` resource to your `resources` folder, and add `start meta-target` to your server.cfg.  
+Ensure [PolyZone](https://github.com/mkafrin/PolyZone) is installed.
 
 ## Referencing:
 

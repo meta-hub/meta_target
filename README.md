@@ -419,7 +419,7 @@ anything    - any                 (literally any other data you want to pass thr
   })
 ```
 
-### modelBone
+### modelBones
 ```lua
   -- NOTE: This example uses a single function callback for the entire target
 
@@ -435,7 +435,7 @@ anything    - any                 (literally any other data you want to pass thr
     'door_pside_r'
   }
 
-  target.addModelBones('my_buffalo_target', 'Buffalo', 'fas fa-car', GetHashKey('buffalo'), models, 10.0, onInteract, {
+  target.addModelBone('my_buffalo_target', 'buffalo', 'fas fa-car', GetHashKey('buffalo'), bones, 1.0, onInteract, {
     {
       name = 'lock_door',
       label = 'Lock Door'
@@ -467,7 +467,7 @@ anything    - any                 (literally any other data you want to pass thr
   local networkId = NetworkGetNetworkIdFromEntity(PlayerPedId())
   local boneName = 'IK_L_Hand'
 
-  target.addNetEnt('my_netEnt_target', 'Network Entity', 'fas fa-user', networkId, boneName, 10.0, onInteract, {
+  target.addNetEntBone('my_netEnt_target', 'Network Entity', 'fas fa-user', networkId, boneName, 10.0, onInteract, {
     {
       name = 'hands_up',
       label = 'Hands Up',
@@ -509,7 +509,7 @@ anything    - any                 (literally any other data you want to pass thr
   local networkId = NetworkGetNetworkIdFromEntity(PlayerPedId())
   local boneNames = {'IK_L_Hand','IK_R_Hand'}
 
-  target.addNetEnt('my_netEnt_target', 'Network Entity', 'fas fa-user', networkId, boneNames, 10.0, onInteract, {
+  target.addNetEntBones('my_netEnt_target', 'Network Entity', 'fas fa-user', networkId, boneNames, 10.0, onInteract, {
     {
       name = 'hands_up',
       label = 'Hands Up',

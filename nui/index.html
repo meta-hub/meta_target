@@ -10,10 +10,10 @@
 
   <style type="text/css">    
     :root {
-      --eye-color: rgba(255,255,255, 0.8);
-      --eye-color-active: rgba(175,101,92, 1);
-      --title-color: rgba(175,101,92, 1);
-      --text-color: rgba(255,255,255, 0.8);
+      --eye-color:        rgba(255,255,255, 1);
+      --eye-color-active: rgba(175,101,92,  1);
+      --title-color:      rgba(175,101,92,  1);
+      --text-color:       rgba(255,255,255, 0.8);
     }
 
     * {
@@ -37,6 +37,15 @@
       opacity: 0;
     }
 
+    #bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
     #container {
       position: absolute;
       top: 50%;
@@ -49,6 +58,7 @@
       display: flex;
       flex-direction: column;
       gap: 5px;
+      z-index: 1;
     }
 
     .eye {
@@ -114,6 +124,8 @@
   </style>
 </head>
 <body>
+  <div id='bg' onclick='closeFrame()'></div>
+
   <div id='container'>
     <div id='eye' class='eye active fas fa-eye'></div>
 
@@ -200,9 +212,15 @@
             }
 
             $.post(`https://${GetParentResourceName()}/select`,JSON.stringify(payload))
+            document.body.style.opacity = 0  
           }
         }
       }      
+    }
+
+    function closeFrame() {
+      document.body.style.opacity = 0        
+      $.post(`https://${GetParentResourceName()}/closed`)   
     }
 
     window.addEventListener('message',function(e) {
@@ -229,9 +247,8 @@
     })
 
     window.addEventListener('keyup',function(e) {
-      if (e.key == "ESCAPE" || e.key == "escape" || e.key == "ESC" || e.key == "esc") {
-        document.body.style.opacity = 0        
-        $.post(`https://${GetParentResourceName()}/closed`)
+      if (e.key == "Escape" || e.key == "Backspace") {
+        closeFrame()
       }
     })
   </script>

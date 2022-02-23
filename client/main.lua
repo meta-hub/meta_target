@@ -9,6 +9,10 @@ local selectMethods = {
     return t.onSelect(...)
   end,
 
+  ['table'] = function(t,...)
+    return t.onSelect(...)
+  end,
+
   ['string'] = function(t,...)
     return TriggerEvent(t.onSelect,...)
   end
@@ -126,7 +130,10 @@ local typeChecks = {
       return false
     end
 
-    if #(GetWorldPositionOfEntityBone(ent,target.bone) - pos) <= target.radius then
+    local boneIndex = GetEntityBoneIndexByName(ent,target.bone)
+    local bonePos = GetWorldPositionOfEntityBone(ent,boneIndex)
+
+    if #(pos - bonePos) <= target.radius then
       return true
     end
 
@@ -143,7 +150,8 @@ local function onSelect(target,option,...)
 end
 
 local function shouldTargetRender(target,...)
-  return pcall(typeChecks[target.type],target,...)
+  local res,ret,err = pcall(typeChecks[target.type],target,...)
+  return ret
 end
 
 local function sendUiConfig()
@@ -211,14 +219,14 @@ local function checkActiveTargets()
   local didChange = false
 
   for _,target in ipairs(targets) do
-    if shouldTargetRender(target,pos,entHit,endCoords,entityModel,netId,isNetworked) then
+    if shouldTargetRender(target,pos,entityHit,endCoords,entityModel,netId,isNetworked) then
+      table.insert(newTargets,target)
+
       if not activeTargets[target.id] then
         activeTargets[target.id] = true
         didChange = true
         break
       end
-
-      table.insert(newTargets,target)
     else
       if activeTargets[target.id] then
         activeTargets[target.id] = nil
@@ -234,46 +242,71 @@ local function checkActiveTargets()
 end
 
 local gameName = GetGameName()
+local uiFocus
+
+local function targetUi()
+  Wait(0)
+
+  SetCursorLocation(0.5,0.5)
+  SetNuiFocus(true,true)
+  uiFocus = true
+end
 
 Citizen.CreateThread(function()
-  local control       = gameName == 'redm' and 0x580C4473 or 37--Controls.Get("HudSpecial")
-  local revealControl = gameName == 'redm' and 0xCF8A4ECA or 37--Controls.Get("RevealHud")
-  local radarControl  = gameName == 'redm' and 0x0F39B3D4 or 37--Controls.Get("SelectRadarMode")
+  local control        = gameName == 'redm' and 0x580C4473 or 37--Controls.Get("HudSpecial")
+  local revealControl  = gameName == 'redm' and 0x07CE1E61 or 24--Controls.Get("RevealHud")
+  local disableControl = gameName == 'redm' and 0x0F39B3D4 or 37--Controls.Get("SelectRadarMode")
 
   while true do
     Wait(0)
 
     DisableControlAction(0,control)
     DisableControlAction(0,revealControl)
-    DisableControlAction(0,radarControl)
+    DisableControlAction(0,disableControl)
 
-    if isOpen then
-      if IsDisabledControlJustReleased(0,control)
-      or IsControlJustPressed(0,control) 
-      then
-        closeUi()
-      end
+    if not uiFocus then
+      if isOpen then
+        checkActiveTargets()
 
-      checkActiveTargets()
-    else
-      if IsDisabledControlJustPressed(0,control)
-      or IsControlJustPressed(0,control) 
-      then
-        openUi()
+        if IsDisabledControlJustReleased(0,control)
+        or IsControlJustReleased(0,control) 
+        then
+          closeUi()
+        end
+
+        if IsDisabledControlJustReleased(0,revealControl)
+        or IsControlJustReleased(0,revealControl)  
+        then
+          targetUi()
+        end
+      else
+        if IsDisabledControlJustPressed(0,control)
+        or IsControlJustPressed(0,control) 
+        then
+          openUi()
+        end
       end
     end
   end
 end)
 
 RegisterNUICallback('closed',function()
+  uiFocus = false
+  isOpen  = false
   SetNuiFocus(false,false)
 end)
 
 RegisterNUICallback('select',function(data)
-  data.id     = tonumber(data.id)
+  data.id     = data.id
   data.index  = tonumber(data.index)+1
   
-  local target = activeTargets[data.id]
+  local isActive = activeTargets[data.id]
+
+  if not isActive then
+    return
+  end
+
+  local target = targets[data.index]
 
   if not target then
     return
@@ -284,6 +317,10 @@ RegisterNUICallback('select',function(data)
   if not option then
     return
   end
+  
+  uiFocus = false
+  isOpen  = false
+  SetNuiFocus(false,false)
 
   onSelect(target,option)
 end)
@@ -324,7 +361,7 @@ end
 
 local function addModel(...)
   local id,title,icon,model,radius,onSelect,items,vars = evalArgs({'id','title','icon','model','radius','onSelect','items','vars'},...)
-  local hash = type(model) == 'number' and model or GetHashKey(model)%0x100000000
+  local hash = (type(model) == 'number' and model or GetHashKey(model))%0x100000000
 
   addTarget({
     id        = id,
@@ -342,12 +379,14 @@ end
 
 local function addLocalEntBone(...)
   local id,title,icon,entId,bone,radius,onSelect,items,vars = evalArgs({'id','title','icon','entId','bone','radius','onSelect','items','vars'},...)
+  local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
     id        = id,
     type      = 'localEntBone',
     title     = title,
     entId     = entId,
+    hash      = modelHash,
     bone      = bone,
     radius    = radius,
     onSelect  = onSelect,
@@ -359,12 +398,14 @@ end
 
 local function addNetEntBone(...)
   local id,title,icon,netId,bone,radius,onSelect,items,vars = evalArgs({'id','title','icon','netId','bone','radius','onSelect','items','vars'},...)
+  local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
     id        = id,
     type      = 'netEntBone',
     title     = title,
     netId     = netId,
+    hash      = modelHash,
     bone      = bone,
     radius    = radius,
     onSelect  = onSelect,
@@ -376,14 +417,14 @@ end
 
 local function addModelBone(...)
   local id,title,icon,model,bone,radius,onSelect,items,vars = evalArgs({'id','title','icon','model','bone','radius','onSelect','items','vars'},...)
-  local hash = type(bone) == 'number' and bone or GetHashKey(bone)%0x100000000
+  local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
     id        = id,
     type      = 'modelBone',
     title     = title,
     model     = model,
-    hash      = hash,
+    hash      = modelHash,
     bone      = bone,
     radius    = radius,
     onSelect  = onSelect,

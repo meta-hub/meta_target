@@ -233,10 +233,12 @@ local function checkActiveTargets()
   end
 end
 
+local gameName = GetGameName()
+
 Citizen.CreateThread(function()
-  local control       = Controls.Get("HudSpecial")
-  local revealControl = Controls.Get("RevealHud")
-  local radarControl  = Controls.Get("SelectRadarMode")
+  local control       = gameName == 'redm' and 0x580C4473 or 37--Controls.Get("HudSpecial")
+  local revealControl = gameName == 'redm' and 0xCF8A4ECA or 37--Controls.Get("RevealHud")
+  local radarControl  = gameName == 'redm' and 0x0F39B3D4 or 37--Controls.Get("SelectRadarMode")
 
   while true do
     Wait(0)

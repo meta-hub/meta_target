@@ -2,6 +2,7 @@
 
 ## Installation:  
 Add the `meta-target` resource to your `resources` folder, and add `start meta-target` to your server.cfg.  
+Alternatively, calling the export by the same name works.  
 Ensure [PolyZone](https://github.com/mkafrin/PolyZone) is installed.
 
 ## Referencing:

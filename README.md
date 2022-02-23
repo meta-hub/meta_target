@@ -1,5 +1,11 @@
 # meta-target
 
+## ⚠️ Pre-Release ⚠️
+This resource has lacked extensive testing.  
+Development and but-fixing will be continued, however all features may not work correctly.  
+Please report bugs, incorrect readme instructions/examples, or any other issue you might find, right here on github issues.  
+You can also post any missing features from other targetting resources that you would like added through github issues.
+
 ## Installation:  
 Add the `meta-target` resource to your `resources` folder, and add `start meta-target` to your server.cfg.  
 Alternatively, calling the export by the same name works.  
@@ -8,7 +14,8 @@ Ensure [PolyZone](https://github.com/mkafrin/PolyZone) is installed.
 ## Referencing:
 
 Add the api to your resource fxmanifest.lua:
-`client_script '@redm-target/lib/target.lua'`
+`client_script '@redm-target/lib/target.lua'`  
+NOTE: You can use exports by the same function name if you choose (as the examples.lua file does).
 
 ## Api functions:
 ```

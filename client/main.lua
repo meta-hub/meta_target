@@ -203,8 +203,8 @@ local function isEntityValid(ent)
 end
 
 local function checkActiveTargets()
-  local pos = GetEntityCoords(PlayerPedId())
-  local hit,endCoords,entityHit = s2w.get(-1,PlayerPedId(),0)
+  local pos = GetEntityCoords(playerPed)
+  local hit,endCoords,entityHit = s2w.get(-1,playerPed,0)
   local entityModel,netId,isNetworked = false,false,false
 
   if isEntityValid(entityHit) and GetEntityType(entityHit) ~= 0 then

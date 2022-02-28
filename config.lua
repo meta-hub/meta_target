@@ -7,3 +7,5 @@ Config = {
     ['--text-color']        = 'rgba(255,255,255, 0.8)',
   }
 }
+
+Config.DefaultRadius = 5.0

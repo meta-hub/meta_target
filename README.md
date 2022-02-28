@@ -24,8 +24,8 @@ returns nil       target.addModel           (id, title, icon, model,      radius
 returns nil       target.addModels          (id, title, icon, models,     radius,   onInteract, items,      vars)
 returns nil       target.addNetEnt          (id, title, icon, netId,      radius,   onInteract, items,      vars)
 returns nil       target.addLocalEnt        (id, title, icon, entId,      radius,   onInteract, items,      vars)
-returns nil       target.addInternalPoly    (id, title, icon, points,     options,  onInteract, items,      vars)
-returns nil       target.addInternalBoxZone (id, title, icon, center,     length,   width,      options,    onInteract, items, vars)
+returns nil       target.addInternalPoly    (id, title, icon, points,     options,  radius,     onInteract, items,      vars)
+returns nil       target.addInternalBoxZone (id, title, icon, center,     length,   width,      options,    radius,     onInteract, items, vars)
 returns function  target.addExternalPoly    (id, title, icon, onInteract, items,    vars)
 returns function  target.addExternalBoxZone (id, title, icon, onInteract, items,    vars)
 returns nil       target.addNetEntBone      (id, title, icon, netId,      bone,     radius,     onInteract, items,      vars)
@@ -306,7 +306,7 @@ anything    - any                 (literally any other data you want to pass thr
     gridDivisions=25
   }
 
-  target.addInternalPoly('pinkcage_target', 'Pink Cage', 'fas fa-home', points, options, onInteract, {
+  target.addInternalPoly('pinkcage_target', 'Pink Cage', 'fas fa-home', points, options, 3.0, onInteract, {
     {
       name = 'lock_door',
       label = 'Lock Door'
@@ -335,7 +335,7 @@ anything    - any                 (literally any other data you want to pass thr
     scale={1.0,1.0,1.0}
   }
 
-  target.addInternalPoly('pinkcage_target', 'Pink Cage', 'fas fa-home', center, length, width, options, onInteract, {
+  target.addInternalBoxZone('pinkcage_target', 'Pink Cage', 'fas fa-home', center, length, width, options, 3.0, onInteract, {
     {
       name = 'lock_door',
       label = 'Lock Door'

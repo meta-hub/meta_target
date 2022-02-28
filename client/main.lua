@@ -75,7 +75,6 @@ local typeChecks = {
 
   ['polyZone'] = function(target)
   ['polyZone'] = function(target,pos,ent,endPos)
-    print('POLY',target.radius,#(pos - endPos),pos,endPos)
     if #(pos - endPos) > target.radius then
       return false
     end

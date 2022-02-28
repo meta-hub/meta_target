@@ -164,6 +164,7 @@ local function sendUiConfig()
 end
 
 local function openUi()
+  playerPed = PlayerPedId()
   isOpen = true
   activeTargets = {}
 
@@ -263,6 +264,7 @@ Citizen.CreateThread(function()
     DisableControlAction(0,control)
     DisableControlAction(0,revealControl)
     DisableControlAction(0,disableControl)
+    DisablePlayerFiring(playerPed, true)
 
     if not uiFocus then
       if isOpen then

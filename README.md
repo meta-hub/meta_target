@@ -232,12 +232,12 @@ anything    - any                 (literally any other data you want to pass thr
     {
       name = 'hands_up',
       label = 'Hands Up',
-      onInteract = 'myscript:handsUp'
+      onSelect = 'myscript:handsUp'
     },
     {
       name = 'open_inventory',
       label = 'Open Inventory',
-      onInteract = 'myscript:openInventory'
+      onSelect = 'myscript:openInventory'
     },
     {
       name = 'ragdoll',
@@ -268,12 +268,12 @@ anything    - any                 (literally any other data you want to pass thr
     {
       name = 'hands_up',
       label = 'Hands Up',
-      onInteract = handsUp
+      onSelect = handsUp
     },
     {
       name = 'open_inventory',
       label = 'Open Inventory',
-      onInteract = openInventory
+      onSelect = openInventory
     },
   },{
     foo = 'bar'
@@ -479,12 +479,12 @@ anything    - any                 (literally any other data you want to pass thr
     {
       name = 'hands_up',
       label = 'Hands Up',
-      onInteract = 'myscript:handsUp'
+      onSelect = 'myscript:handsUp'
     },
     {
       name = 'open_inventory',
       label = 'Open Inventory',
-      onInteract = 'myscript:openInventory'
+      onSelect = 'myscript:openInventory'
     },
     {
       name = 'ragdoll',
@@ -521,12 +521,12 @@ anything    - any                 (literally any other data you want to pass thr
     {
       name = 'hands_up',
       label = 'Hands Up',
-      onInteract = 'myscript:handsUp'
+      onSelect = 'myscript:handsUp'
     },
     {
       name = 'open_inventory',
       label = 'Open Inventory',
-      onInteract = 'myscript:openInventory'
+      onSelect = 'myscript:openInventory'
     },
     {
       name = 'ragdoll',
@@ -558,12 +558,12 @@ anything    - any                 (literally any other data you want to pass thr
     {
       name = 'hands_up',
       label = 'Hands Up',
-      onInteract = handsUp
+      onSelect = handsUp
     },
     {
       name = 'open_inventory',
       label = 'Open Inventory',
-      onInteract = openInventory
+      onSelect = openInventory
     },
   },{
     foo = 'bar'
@@ -591,12 +591,12 @@ anything    - any                 (literally any other data you want to pass thr
     {
       name = 'hands_up',
       label = 'Hands Up',
-      onInteract = handsUp
+      onSelect = handsUp
     },
     {
       name = 'open_inventory',
       label = 'Open Inventory',
-      onInteract = openInventory
+      onSelect = openInventory
     },
   },{
     foo = 'bar'

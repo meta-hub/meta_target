@@ -74,6 +74,11 @@ local typeChecks = {
   end,
 
   ['polyZone'] = function(target)
+  ['polyZone'] = function(target,pos,ent,endPos)
+    print('POLY',target.radius,#(pos - endPos),pos,endPos)
+    if #(pos - endPos) > target.radius then
+      return false
+    end
     return target.isInside
   end,
 
@@ -199,6 +204,11 @@ local function isEntityValid(ent)
   end
 
   return DoesEntityExist(ent)
+end
+
+local function getEyeCoords()
+  local _,endCoords,_, _ = s2w.get(-1,playerPed,0)
+  return endCoords
 end
 
 local function checkActiveTargets()
@@ -494,12 +504,13 @@ local apiFunctions = {
   end,
 
   ['addInternalPoly'] = function(...)
-    local id,title,icon,points,options,onSelect,items,vars = evalArgs({'id','title','icon','points','options','onSelect','items','vars'},...)
+    local id,title,icon,points,options,radius,onSelect,items,vars = evalArgs({'id','title','icon','points','options','radius','onSelect','items','vars'},...)
 
     local target = {
       id        = id,
       type      = 'polyZone',
       title     = title,
+      radius    = radius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -508,7 +519,7 @@ local apiFunctions = {
 
     local polyZone = PolyZone:Create(points,options)
 
-    polyZone:onPointInOut(PolyZone.getPlayerPosition,function(isPointInside,point)
+    polyZone:onPointInOut(getEyeCoords,function(isPointInside,point)
       target.isInside = isPointInside
     end,100)
 
@@ -516,12 +527,13 @@ local apiFunctions = {
   end,
 
   ['addExternalPoly'] = function(...)
-    local id,title,icon,onSelect,items,vars = evalArgs({'id','title','icon','onSelect','items','vars'},...)
+    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
 
     local target = {
       id        = id,
       type      = 'polyZone',
       title     = title,
+      radius    = radius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -536,12 +548,13 @@ local apiFunctions = {
   end,
 
   ['addInternalBoxZone'] = function(...)
-    local id,title,icon,center,length,width,options,onSelect,items,vars = evalArgs({'id','title','icon','center','length','width','options','onSelect','items','vars'},...)
+    local id,title,icon,center,length,width,options,radius,onSelect,items,vars = evalArgs({'id','title','icon','center','length','width','options','radius','onSelect','items','vars'},...)
 
     local target = {
       id        = id,
       type      = 'polyZone',
       title     = title,
+      radius    = radius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -549,8 +562,7 @@ local apiFunctions = {
     }
 
     local boxZone = BoxZone:Create(center,length,width,options)
-
-    boxZone:onPointInOut(PolyZone.getPlayerPosition,function(isPointInside,point)
+    boxZone:onPointInOut(getEyeCoords,function(isPointInside,point)
       target.isInside = isPointInside
     end,500)
 
@@ -558,12 +570,13 @@ local apiFunctions = {
   end,
 
   ['addExternalBoxZone'] = function(...)
-    local id,title,icon,onSelect,items,vars = evalArgs({'id','title','icon','onSelect','items','vars'},...)
+    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
 
     local target = {
       id        = id,
       type      = 'polyZone',
       title     = title,
+      radius    = radius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,

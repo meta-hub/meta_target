@@ -264,10 +264,10 @@ Citizen.CreateThread(function()
     DisableControlAction(0,control)
     DisableControlAction(0,revealControl)
     DisableControlAction(0,disableControl)
-    DisablePlayerFiring(playerPed, true)
 
     if not uiFocus then
       if isOpen then
+        DisablePlayerFiring(PlayerPedId(), true)
         checkActiveTargets()
 
         if IsDisabledControlJustReleased(0,control)

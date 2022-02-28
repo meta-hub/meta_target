@@ -3,6 +3,8 @@ local activeTargets = {}
 local idIndexMap = {}
 local isOpen
 local cfgSent
+local playerPed
+local eyeCoords
 
 local selectMethods = {
   ['function'] = function(t,...)
@@ -202,12 +204,17 @@ local function isEntityValid(ent)
   return DoesEntityExist(ent)
 end
 
+local function getEyeCoords()
+  local _,endCoords,_, _ = s2w.get(-1,playerPed,0)
+  return endCoords
+end
+
 local function checkActiveTargets()
   local pos = GetEntityCoords(playerPed)
-  local hit,endCoords,entityHit = s2w.get(-1,playerPed,0)
+  local hit,endCoords,entityHit, entityType = s2w.get(-1,playerPed,0)
   local entityModel,netId,isNetworked = false,false,false
 
-  if isEntityValid(entityHit) and GetEntityType(entityHit) ~= 0 then
+  if isEntityValid(entityHit) and entityType ~= 0 then
     entityModel = GetEntityModel(entityHit)%0x100000000
     isNetworked = NetworkGetEntityIsNetworked(entityHit)
 
@@ -267,7 +274,7 @@ Citizen.CreateThread(function()
 
     if not uiFocus then
       if isOpen then
-        DisablePlayerFiring(PlayerPedId(), true)
+        DisablePlayerFiring(playerPed, true)
         checkActiveTargets()
 
         if IsDisabledControlJustReleased(0,control)
@@ -510,7 +517,7 @@ local apiFunctions = {
 
     local polyZone = PolyZone:Create(points,options)
 
-    polyZone:onPointInOut(PolyZone.getPlayerPosition,function(isPointInside,point)
+    polyZone:onPointInOut(getEyeCoords,function(isPointInside,point)
       target.isInside = isPointInside
     end,100)
 
@@ -551,8 +558,7 @@ local apiFunctions = {
     }
 
     local boxZone = BoxZone:Create(center,length,width,options)
-
-    boxZone:onPointInOut(PolyZone.getPlayerPosition,function(isPointInside,point)
+    boxZone:onPointInOut(getEyeCoords,function(isPointInside,point)
       target.isInside = isPointInside
     end,500)
 

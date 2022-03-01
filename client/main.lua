@@ -306,7 +306,7 @@ RegisterNUICallback('select',function(data)
     return
   end
 
-  local target = targets[data.index]
+  local target = targets[idIndexMap[data.id]]
 
   if not target then
     return

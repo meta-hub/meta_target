@@ -335,7 +335,7 @@ local function addTarget(target)
 end
 
 local function removeTarget(id)
-  local index = idIndexMap(id)
+  local index = idIndexMap[id]
 
   if not index then
     return

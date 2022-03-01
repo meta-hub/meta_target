@@ -369,7 +369,7 @@ local function addModel(...)
     title     = title,
     model     = model,
     hash      = hash,
-    radius    = radius,
+    radius    = radius and radius or Config.DefaultRadius,
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
@@ -388,7 +388,7 @@ local function addLocalEntBone(...)
     entId     = entId,
     hash      = modelHash,
     bone      = bone,
-    radius    = radius,
+    radius    = radius and radius or Config.DefaultRadius,
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
@@ -407,7 +407,7 @@ local function addNetEntBone(...)
     netId     = netId,
     hash      = modelHash,
     bone      = bone,
-    radius    = radius,
+    radius    = radius and radius or Config.DefaultRadius,
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
@@ -426,7 +426,7 @@ local function addModelBone(...)
     model     = model,
     hash      = modelHash,
     bone      = bone,
-    radius    = radius,
+    radius    = radius and radius or Config.DefaultRadius,
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
@@ -443,7 +443,7 @@ local apiFunctions = {
       type      = 'point',
       title     = title,
       point     = point,
-      radius    = radius,
+      radius    = radius and radius or Config.DefaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -457,7 +457,7 @@ local apiFunctions = {
     local id,title,icon,models,radius,onSelect,items,vars = evalArgs({'id','title','icon','models','radius','onSelect','items','vars'},...)
 
     for i=1,#models do
-      addModel(id .. ":" .. i,title,icon,models[i],radius,onSelect,items,vars)
+      addModel(id .. ":" .. i,title,icon,models[i],radius and radius or Config.DefaultRadius,onSelect,items,vars)
     end
   end,
 
@@ -469,7 +469,7 @@ local apiFunctions = {
       type      = 'networkEnt',
       title     = title,
       netId     = netId,
-      radius    = radius,
+      radius    = radius and radius or Config.DefaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -485,7 +485,7 @@ local apiFunctions = {
       type      = 'localEnt',
       title     = title,
       entId     = entId,
-      radius    = radius,
+      radius    = radius and radius or Config.DefaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -500,6 +500,7 @@ local apiFunctions = {
       id        = id,
       type      = 'polyZone',
       title     = title,
+      radius    = radius and radius or Config.DefaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -522,6 +523,7 @@ local apiFunctions = {
       id        = id,
       type      = 'polyZone',
       title     = title,
+      radius    = radius and radius or Config.DefaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -542,6 +544,7 @@ local apiFunctions = {
       id        = id,
       type      = 'polyZone',
       title     = title,
+      radius    = radius and radius or Config.DefaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -564,6 +567,7 @@ local apiFunctions = {
       id        = id,
       type      = 'polyZone',
       title     = title,
+      radius    = radius and radius or Config.DefaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -583,7 +587,7 @@ local apiFunctions = {
     local id,title,icon,netId,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','netId','bones','radius','onSelect','items','vars'},...)
 
     for i=1,#bones do
-      addNetEntBone(id .. ":" .. i,title,icon,netId,bones[i],radius,onSelect,items,vars)
+      addNetEntBone(id .. ":" .. i,title,icon,netId,bones[i],radius and radius or Config.DefaultRadius,onSelect,items,vars)
     end
   end,
 
@@ -593,7 +597,7 @@ local apiFunctions = {
     local id,title,icon,entId,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','entId','bones','radius','onSelect','items','vars'},...)
 
     for i=1,#bones do
-      addLocalEntBone(id .. ":" .. i,title,icon,entId,bones[i],radius,onSelect,items,vars)
+      addLocalEntBone(id .. ":" .. i,title,icon,entId,bones[i],radius and radius or Config.DefaultRadius,onSelect,items,vars)
     end
   end,
 
@@ -603,7 +607,7 @@ local apiFunctions = {
     local id,title,icon,model,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','model','bones','radius','onSelect','items','vars'},...)
 
     for i=1,#bones do
-      addModelBone(id .. ":" .. i,title,icon,model,bones[i],radius,onSelect,items,vars)
+      addModelBone(id .. ":" .. i,title,icon,model,bones[i],radius and radius or Config.DefaultRadius,onSelect,items,vars)
     end
   end,
 

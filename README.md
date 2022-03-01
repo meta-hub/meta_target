@@ -20,23 +20,24 @@ NOTE: You can use exports by the same function name if you choose (as the exampl
 
 ## Api functions:
 ```
-returns nil       target.addPoint           (id, title, icon, point,      radius,   onInteract, items,      vars)
-returns nil       target.addModel           (id, title, icon, model,      radius,   onInteract, items,      vars)
-returns nil       target.addModels          (id, title, icon, models,     radius,   onInteract, items,      vars)
-returns nil       target.addNetEnt          (id, title, icon, netId,      radius,   onInteract, items,      vars)
-returns nil       target.addLocalEnt        (id, title, icon, entId,      radius,   onInteract, items,      vars)
-returns nil       target.addInternalPoly    (id, title, icon, points,     options,  onInteract, items,      vars)
-returns nil       target.addInternalBoxZone (id, title, icon, center,     length,   width,      options,    onInteract, items, vars)
-returns function  target.addExternalPoly    (id, title, icon, onInteract, items,    vars)
-returns function  target.addExternalBoxZone (id, title, icon, onInteract, items,    vars)
-returns nil       target.addNetEntBone      (id, title, icon, netId,      bone,     radius,     onInteract, items,      vars)
-returns nil       target.addNetEntBones     (id, title, icon, netId,      bones,    radius,     onInteract, items,      vars)
-returns nil       target.addLocalEntBone    (id, title, icon, entId,      bone,     radius,     onInteract, items,      vars)
-returns nil       target.addLocalEntBones   (id, title, icon, entId,      bones,    radius,     onInteract, items,      vars)
-returns nil       target.addModelBone       (id, title, icon, model,      bone,     radius,     onInteract, items,      vars)
-returns nil       target.addModelBones      (id, title, icon, models,     bones,    radius,     onInteract, items,      vars)
-returns nil       target.remove             (id)
+ret nil             target.addPoint           (id, title, icon, point,      radius,   onInteract, items,      vars)
+ret nil             target.addModel           (id, title, icon, model,      radius,   onInteract, items,      vars)
+ret table[id,...]   target.addModels          (id, title, icon, models,     radius,   onInteract, items,      vars)
+ret nil             target.addNetEnt          (id, title, icon, netId,      radius,   onInteract, items,      vars)
+ret nil             target.addLocalEnt        (id, title, icon, entId,      radius,   onInteract, items,      vars)
+ret nil             target.addInternalPoly    (id, title, icon, points,     options,  onInteract, items,      vars)
+ret nil             target.addInternalBoxZone (id, title, icon, center,     length,   width,      options,    onInteract, items, vars)
+ret function        target.addExternalPoly    (id, title, icon, onInteract, items,    vars)
+ret function        target.addExternalBoxZone (id, title, icon, onInteract, items,    vars)
+ret nil             target.addNetEntBone      (id, title, icon, netId,      bone,     radius,     onInteract, items,      vars)
+ret table[id,...]   target.addNetEntBones     (id, title, icon, netId,      bones,    radius,     onInteract, items,      vars)
+ret nil             target.addLocalEntBone    (id, title, icon, entId,      bone,     radius,     onInteract, items,      vars)
+ret table[id,...]   target.addLocalEntBones   (id, title, icon, entId,      bones,    radius,     onInteract, items,      vars)
+ret nil             target.addModelBone       (id, title, icon, model,      bone,     radius,     onInteract, items,      vars)
+ret table[id,...]   target.addModelBones      (id, title, icon, models,     bones,    radius,     onInteract, items,      vars)
+ret nil             target.remove             (id, ... [,id,id])
 ```
+
 ### Argument info:
 
 ##### REQUIRED
@@ -198,7 +199,13 @@ anything    - any                 (literally any other data you want to pass thr
     'sanchez'
   }
 
-  target.addModels('my_cars_target', 'Cars', 'fas fa-car', models, 10.0, onInteract, {
+  -- NOTE: 
+  -- addModels is a a shorthand call for repeated `addModel` calls.
+  -- as a result, unique ID's will be generated for each successive call.
+  -- cache all "true" target ID's in the return value of the target.addModels function call.
+  -- this example is synonymous with all other non-singular target definition functions, e.g:
+  -- `addModelBones`, `addLocalEntBones`, `addNetEntBones`.
+  local targetIds = target.addModels('my_cars_target', 'Cars', 'fas fa-car', models, 10.0, onInteract, {
     {
       name = 'lock_door',
       label = 'Lock Door'
@@ -206,6 +213,15 @@ anything    - any                 (literally any other data you want to pass thr
   },{
     foo = 'bar'
   })
+
+  -- unpack targetIds to remove
+  target.removeTarget(table.unpack(targetIds))
+
+  -- OR iterate to remove (bad)
+  for _,tid in ipairs(targetIds) do
+    target.removeTarget(tid)
+  end
+  -- 
 ```
 
 ### netEnt

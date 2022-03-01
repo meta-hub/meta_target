@@ -342,15 +342,16 @@ local function addTarget(target)
   return targetIndex
 end
 
-local function removeTarget(id)
-  local index = idIndexMap[id]
+local function removeTarget(...)
+  for i=1,select("#",...),1 do
+    local id = select(i,...)
+    local index = idIndexMap[id]
 
-  if not index then
-    return
+    if index then
+      idIndexMap[id] = nil
+      targets[index] = false
+    end
   end
-
-  idIndexMap[id] = nil
-  targets[index] = false
 end
 
 local function evalArgs(argOrder,idOrOpts,...)
@@ -467,11 +468,19 @@ local apiFunctions = {
   ['addModel'] = addModel,
 
   ['addModels'] = function(...)
+    local targetIds = {}
+
     local id,title,icon,models,radius,onSelect,items,vars = evalArgs({'id','title','icon','models','radius','onSelect','items','vars'},...)
 
     for i=1,#models do
-      addModel(id .. ":" .. i,title,icon,models[i],radius or Config.defaultRadius,onSelect,items,vars)
+      local targetId = id .. ":" .. i
+
+      addModel(targetId,title,icon,models[i],radius or Config.defaultRadius,onSelect,items,vars)
+
+      table.insert(targetIds,targetId)
     end
+
+    return table.unpack(targetIds)
   end,
 
   ['addNetEnt'] = function(...)
@@ -526,7 +535,7 @@ local apiFunctions = {
 
     polyZone:onPointInOut(PolyZone.getPlayerPosition,function(isPointInside,point)
       target.isInside = isPointInside
-    end,100)
+    end,500)
 
     addTarget(target)
   end,
@@ -599,31 +608,55 @@ local apiFunctions = {
   ['addNetEntBone'] = addNetEntBone,
 
   ['addNetEntBones'] = function(...)
+    local targetIds = {}
+
     local id,title,icon,netId,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','netId','bones','radius','onSelect','items','vars'},...)
 
     for i=1,#bones do
-      addNetEntBone(id .. ":" .. i,title,icon,netId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+      local targetId = id .. ":" .. i
+
+      addNetEntBone(targetId,title,icon,netId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+
+      table.insert(targetIds,targetId)
     end
+
+    return table.unpack(targetIds)
   end,
 
   ['addLocalEntBone'] = addLocalEntBone,
 
   ['addLocalEntBones'] = function(...)
+    local targetIds = {}
+
     local id,title,icon,entId,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','entId','bones','radius','onSelect','items','vars'},...)
 
     for i=1,#bones do
-      addLocalEntBone(id .. ":" .. i,title,icon,entId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+      local targetId = id .. ":" .. i
+
+      addLocalEntBone(targetId,title,icon,entId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+
+      table.insert(targetIds,targetId)
     end
+
+    return table.unpack(targetIds)
   end,
 
   ['addModelBone'] = addModelBone,
 
   ['addModelBones'] = function(...)
+    local targetIds = {}
+
     local id,title,icon,model,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','model','bones','radius','onSelect','items','vars'},...)
 
     for i=1,#bones do
-      addModelBone(id .. ":" .. i,title,icon,model,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+      local targetId = id .. ":" .. i
+
+      addModelBone(targetId,title,icon,model,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+
+      table.insert(targetIds,targetId)
     end
+
+    return table.unpack(targetIds)
   end,
 
   ['remove'] = removeTarget

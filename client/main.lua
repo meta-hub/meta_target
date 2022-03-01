@@ -32,7 +32,7 @@ local typeChecks = {
       return false
     end
 
-    if #(post - endPos) > target.radius then
+    if #(pos - endPos) > target.radius then
       return false
     end
 

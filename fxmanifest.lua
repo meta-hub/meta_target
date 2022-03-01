@@ -17,7 +17,7 @@ client_scripts {
   'config.lua',
   'client/s2w.lua',
   'client/main.lua',
-  'client/examples.lua',
+  --'client/examples.lua',
 }
 
 files {

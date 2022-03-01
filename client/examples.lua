@@ -2,7 +2,7 @@ local function onSelect(t,o)
   print(t.id,o.name)
 end
 
-local mTarget = exports['meta-target']
+local mTarget = exports.meta_target
 
 if GetGameName() == 'redm' then
   local models = {'p_barberchair03x','p_barberchair01x','p_barberchair02x'}

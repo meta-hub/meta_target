@@ -1,4 +1,6 @@
 Config = {
+  defaultRadius = 5.0,
+
   colors = {
     -- note: dont edit key/index, aligns with html
     ['--eye-color-active']  = 'rgba(175,101,092, 1)',
@@ -7,5 +9,3 @@ Config = {
     ['--text-color']        = 'rgba(255,255,255, 0.8)',
   }
 }
-
-Config.DefaultRadius = 5.0

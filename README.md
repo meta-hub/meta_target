@@ -7,7 +7,7 @@ Please report bugs, incorrect readme instructions/examples, or any other issue y
 You can also post any missing features from other targetting resources that you would like added through github issues.
 
 ## Installation:  
-Download the latest releae of `meta-target`.  
+Download the latest release of `meta-target`.  
 Add the `meta-target` resource to your `resources` folder, and add `start meta-target` to your server.cfg.  
 Alternatively, calling the export by the same name works.  
 Ensure [PolyZone](https://github.com/mkafrin/PolyZone) is installed.

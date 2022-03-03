@@ -20,7 +20,7 @@ local selectMethods = {
 
 local typeChecks = {
   ['point'] = function(target,pos)
-    if #(pos - target.pos) <= target.radius then
+    if #(pos - target.point) <= target.radius then
       return true
     end
 

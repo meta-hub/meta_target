@@ -1,6 +1,8 @@
 # meta_target
 
 ## ⚠️ Pre-Release ⚠️
+Probably don't use this for now.  
+Export function names __will__ be changed, compatibility __will__ be __broken__.  
 This resource has lacked extensive testing.  
 Development and bug-fixing will be continued, however all features may not work correctly.  
 Please report bugs, incorrect readme instructions/examples, or any other issue you might find, right here on github issues.  

@@ -4,6 +4,12 @@ local idIndexMap = {}
 local isOpen
 local cfgSent
 
+local endCoords,entHit = vec3(0,0,0),0
+
+local function getEndCoords()
+  return endCoords
+end
+
 local selectMethods = {
   ['function'] = function(t,...)
     return t.onSelect(...)
@@ -20,7 +26,7 @@ local selectMethods = {
 
 local typeChecks = {
   ['point'] = function(target,pos)
-    if #(pos - target.point) <= target.radius then
+    if #(pos - target.pos) <= target.radius then
       return true
     end
 
@@ -32,15 +38,15 @@ local typeChecks = {
       return false
     end
 
+    if target.hash ~= modelHash then
+      return false
+    end
+
     if #(pos - endPos) > target.radius then
       return false
     end
 
-    if target.hash == modelHash then
-      return true
-    end
-
-    return false
+    return true
   end,
 
   ['localEnt'] = function(target,pos,ent,endPos)
@@ -48,15 +54,15 @@ local typeChecks = {
       return false
     end
 
+    if target.entId ~= ent then
+      return false
+    end
+
     if #(pos - endPos) > target.radius then
       return false
     end
 
-    if target.entId == ent then
-      return true
-    end
-
-    return false
+    return true
   end,
 
   ['networkEnt'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId)
@@ -66,19 +72,23 @@ local typeChecks = {
       return false
     end
 
+    if target.netId ~= netId then
+      return false
+    end
+
     if #(pos - endPos) > target.radius then
       return false
     end
 
-    if target.netId == netId then
-      return true
-    end
-
-    return false
+    return true
   end,
 
-  ['polyZone'] = function(target)
-    return target.isInside
+  ['polyZone'] = function(target,pos,ent,endPos)
+    if not target.isInside then
+      return false
+    end
+
+    return (#(pos - endPos) <= target.radius)
   end,
 
   ['localEntBone'] = function(target,pos,ent,endPos)
@@ -86,11 +96,11 @@ local typeChecks = {
       return false
     end
 
-    if #(pos - endPos) > target.radius then
+    if target.entId ~= ent then
       return false
     end
 
-    if target.entId ~= ent then
+    if #(pos - endPos) > target.radius then
       return false
     end
 
@@ -106,11 +116,11 @@ local typeChecks = {
       return false
     end
 
-    if #(pos - endPos) > target.radius then
+    if target.netId ~= netId then
       return false
     end
 
-    if target.netId ~= netId then
+    if #(pos - endPos) > target.radius then
       return false
     end
 
@@ -126,11 +136,11 @@ local typeChecks = {
       return false
     end
 
-    if #(pos - endPos) > target.radius then
+    if target.hash ~= modelHash then
       return false
     end
 
-    if target.hash ~= modelHash then
+    if #(pos - endPos) > target.radius then
       return false
     end
 
@@ -208,7 +218,7 @@ end
 
 local function checkActiveTargets()
   local pos = GetEntityCoords(playerPed)
-  local hit,endCoords,entityHit = s2w.get(-1,playerPed,0)
+  local hit,endPos,entityHit = s2w.get(-1,playerPed,0)
   local entityModel,netId,isNetworked = false,false,false
 
   if isEntityValid(entityHit) and GetEntityType(entityHit) ~= 0 then
@@ -219,6 +229,9 @@ local function checkActiveTargets()
       netId = NetworkGetNetworkIdFromEntity(entityHit)
     end
   end
+
+  endCoords = endPos
+  entHit = entityHit
 
   local newTargets = {}
   local didChange = false
@@ -260,9 +273,9 @@ local function targetUi()
 end
 
 Citizen.CreateThread(function()
-  local control        = gameName == 'redm' and 0x580C4473 or 37--Controls.Get("HudSpecial")
-  local revealControl  = gameName == 'redm' and 0x07CE1E61 or 24--Controls.Get("RevealHud")
-  local disableControl = gameName == 'redm' and 0x0F39B3D4 or 37--Controls.Get("SelectRadarMode")
+  local control        = gameName == 'redm' and 0x580C4473 or 37 --Controls.Get("HudSpecial")
+  local revealControl  = gameName == 'redm' and 0x07CE1E61 or 24 --Controls.Get("RevealHud")
+  local disableControl = gameName == 'redm' and 0x0F39B3D4 or 37 --Controls.Get("SelectRadarMode")
 
   while true do
     Wait(0)
@@ -330,7 +343,7 @@ RegisterNUICallback('select',function(data)
   isOpen  = false
   SetNuiFocus(false,false)
 
-  onSelect(target,option)
+  onSelect(target,option,entHit)
 end)
 
 local function addTarget(target)
@@ -518,13 +531,14 @@ local apiFunctions = {
   end,
 
   ['addInternalPoly'] = function(...)
-    local id,title,icon,points,options,onSelect,items,vars = evalArgs({'id','title','icon','points','options','onSelect','items','vars'},...)
+    local id,title,icon,points,options,radius,onSelect,items,vars = evalArgs({'id','title','icon','points','options','radius','onSelect','items','vars'},...)
 
     local target = {
       id        = id,
       type      = 'polyZone',
       title     = title,
       icon      = icon,
+      radius    = radius or Config.defaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -533,7 +547,7 @@ local apiFunctions = {
 
     local polyZone = PolyZone:Create(points,options)
 
-    polyZone:onPointInOut(PolyZone.getPlayerPosition,function(isPointInside,point)
+    polyZone:onPointInOut(getEndCoords,function(isPointInside,point)
       target.isInside = isPointInside
     end,500)
 
@@ -541,13 +555,14 @@ local apiFunctions = {
   end,
 
   ['addExternalPoly'] = function(...)
-    local id,title,icon,onSelect,items,vars = evalArgs({'id','title','icon','onSelect','items','vars'},...)
+    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
 
     local target = {
       id        = id,
       type      = 'polyZone',
       title     = title,
       icon      = icon,
+      radius    = radius or Config.defaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -562,13 +577,14 @@ local apiFunctions = {
   end,
 
   ['addInternalBoxZone'] = function(...)
-    local id,title,icon,center,length,width,options,onSelect,items,vars = evalArgs({'id','title','icon','center','length','width','options','onSelect','items','vars'},...)
+    local id,title,icon,center,length,width,options,radius,onSelect,items,vars = evalArgs({'id','title','icon','center','length','width','options','radius','onSelect','items','vars'},...)
 
     local target = {
       id        = id,
       type      = 'polyZone',
       title     = title,
       icon      = icon,
+      radius    = radius or Config.defaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,
@@ -577,7 +593,7 @@ local apiFunctions = {
 
     local boxZone = BoxZone:Create(center,length,width,options)
 
-    boxZone:onPointInOut(PolyZone.getPlayerPosition,function(isPointInside,point)
+    boxZone:onPointInOut(getEndCoords,function(isPointInside,point)
       target.isInside = isPointInside
     end,500)
 
@@ -585,13 +601,14 @@ local apiFunctions = {
   end,
 
   ['addExternalBoxZone'] = function(...)
-    local id,title,icon,onSelect,items,vars = evalArgs({'id','title','icon','onSelect','items','vars'},...)
+    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
 
     local target = {
       id        = id,
       type      = 'polyZone',
       title     = title,
       icon      = icon,
+      radius    = radius or Config.defaultRadius,
       onSelect  = onSelect,
       items     = items,
       vars      = vars,

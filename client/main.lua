@@ -501,7 +501,7 @@ local apiFunctions = {
   end,
 
   ['addLocalEnt'] = function(...)
-    local id,title,icon,entId,radius,onSelect,items,vars = evalArgs({'idOrOpts','title','icon','entId','radius','onSelect','items','vars'},...)
+    local id,title,icon,entId,radius,onSelect,items,vars = evalArgs({'id','title','icon','entId','radius','onSelect','items','vars'},...)
 
     addTarget({
       id        = id,

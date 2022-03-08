@@ -273,16 +273,19 @@ local function targetUi()
 end
 
 Citizen.CreateThread(function()
-  local control        = gameName == 'redm' and 0x580C4473 or 37 --Controls.Get("HudSpecial")
-  local revealControl  = gameName == 'redm' and 0x07CE1E61 or 24 --Controls.Get("RevealHud")
-  local disableControl = gameName == 'redm' and 0x0F39B3D4 or 37 --Controls.Get("SelectRadarMode")
+  local control = gameName == 'redm' and 0x580C4473 or 37
 
   while true do
     Wait(0)
 
-    DisableControlAction(0,control)
-    DisableControlAction(0,revealControl)
-    DisableControlAction(0,disableControl)
+    if gameName == 'redm' then
+      DisableControlAction(0,control)
+      
+      DisableControlAction(0,0x07CE1E61)
+      DisableControlAction(0,0x0F39B3D4)
+    else
+      DisableControlAction(0,control)
+    end
 
     if not uiFocus then
       if isOpen then

@@ -22,21 +22,21 @@ NOTE: You can use exports by the same function name if you choose (as the exampl
 
 ## Api functions:
 ```
-ret nil             target.addPoint           (id, title, icon, point,      radius,   onInteract, items,      vars)
-ret nil             target.addModel           (id, title, icon, model,      radius,   onInteract, items,      vars)
-ret table[id,...]   target.addModels          (id, title, icon, models,     radius,   onInteract, items,      vars)
-ret nil             target.addNetEnt          (id, title, icon, netId,      radius,   onInteract, items,      vars)
-ret nil             target.addLocalEnt        (id, title, icon, entId,      radius,   onInteract, items,      vars)
-ret nil             target.addInternalPoly    (id, title, icon, points,     options,  onInteract, items,      vars)
-ret nil             target.addInternalBoxZone (id, title, icon, center,     length,   width,      options,    onInteract, items, vars)
-ret function        target.addExternalPoly    (id, title, icon, onInteract, items,    vars)
-ret function        target.addExternalBoxZone (id, title, icon, onInteract, items,    vars)
-ret nil             target.addNetEntBone      (id, title, icon, netId,      bone,     radius,     onInteract, items,      vars)
-ret table[id,...]   target.addNetEntBones     (id, title, icon, netId,      bones,    radius,     onInteract, items,      vars)
-ret nil             target.addLocalEntBone    (id, title, icon, entId,      bone,     radius,     onInteract, items,      vars)
-ret table[id,...]   target.addLocalEntBones   (id, title, icon, entId,      bones,    radius,     onInteract, items,      vars)
-ret nil             target.addModelBone       (id, title, icon, model,      bone,     radius,     onInteract, items,      vars)
-ret table[id,...]   target.addModelBones      (id, title, icon, models,     bones,    radius,     onInteract, items,      vars)
+ret nil             target.addPoint           (id, title, icon, point,      radius,     onInteract, items,      vars)
+ret nil             target.addModel           (id, title, icon, model,      radius,     onInteract, items,      vars)
+ret table[id,...]   target.addModels          (id, title, icon, models,     radius,     onInteract, items,      vars)
+ret nil             target.addNetEnt          (id, title, icon, netId,      radius,     onInteract, items,      vars)
+ret nil             target.addLocalEnt        (id, title, icon, entId,      radius,     onInteract, items,      vars)
+ret nil             target.addInternalPoly    (id, title, icon, points,     options,    radius,     onInteract, items,      vars)
+ret nil             target.addInternalBoxZone (id, title, icon, center,     length,     width,      options,    radius,     onInteract, items, vars)
+ret function        target.addExternalPoly    (id, title, icon, radius,     onInteract, items,      vars)
+ret function        target.addExternalBoxZone (id, title, icon, radius,     onInteract, items,      vars)
+ret nil             target.addNetEntBone      (id, title, icon, netId,      bone,       radius,     onInteract, items,      vars)
+ret table[id,...]   target.addNetEntBones     (id, title, icon, netId,      bones,      radius,     onInteract, items,      vars)
+ret nil             target.addLocalEntBone    (id, title, icon, entId,      bone,       radius,     onInteract, items,      vars)
+ret table[id,...]   target.addLocalEntBones   (id, title, icon, entId,      bones,      radius,     onInteract, items,      vars)
+ret nil             target.addModelBone       (id, title, icon, model,      bone,       radius,     onInteract, items,      vars)
+ret table[id,...]   target.addModelBones      (id, title, icon, models,     bones,      radius,     onInteract, items,      vars)
 ret nil             target.remove             (id, ... [,id,id])
 ```
 
@@ -55,7 +55,7 @@ vars        - table               (a table of any additional data you want to pa
 ##### OPTIONAL (Based on type)
 ```
 any
-radius - number (distance from player to interact with this target)
+radius - number (distance from player to raycast endCoord to interact with this target)
 ```
 
 ```

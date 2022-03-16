@@ -4,6 +4,6 @@ target = {}
 
 for _,name in ipairs(apiRef) do
   target[name] = function(...)
-    exports.meta_target[name](exports['bl-target'],...)
+    exports.meta_target[name](exports.meta_target,...)
   end
 end

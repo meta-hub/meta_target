@@ -25,15 +25,15 @@ local selectMethods = {
 }
 
 local typeChecks = {
-  ['point'] = function(target,pos)
-    if #(pos - target.pos) <= target.radius then
-      return true
+  ['point'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType) 
+    if targetDist > target.radius then
+      return false
     end
 
-    return false
+    return true
   end,
 
-  ['model'] = function(target,pos,ent,endPos,modelHash) 
+  ['model'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType) 
     if not ent then
       return false
     end
@@ -42,14 +42,14 @@ local typeChecks = {
       return false
     end
 
-    if #(pos - endPos) > target.radius then
+    if targetDist > target.radius then
       return false
     end
 
     return true
   end,
 
-  ['localEnt'] = function(target,pos,ent,endPos)
+  ['localEnt'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not ent then
       return false
     end
@@ -58,14 +58,14 @@ local typeChecks = {
       return false
     end
 
-    if #(pos - endPos) > target.radius then
+    if targetDist > target.radius then
       return false
     end
 
     return true
   end,
 
-  ['networkEnt'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId)
+  ['networkEnt'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not ent
     or not isNetworked 
     then
@@ -76,22 +76,22 @@ local typeChecks = {
       return false
     end
 
-    if #(pos - endPos) > target.radius then
+    if targetDist > target.radius then
       return false
     end
 
     return true
   end,
 
-  ['polyZone'] = function(target,pos,ent,endPos)
+  ['polyZone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not target.isInside then
       return false
     end
 
-    return (#(pos - endPos) <= target.radius)
+    return (targetDist <= target.radius)
   end,
 
-  ['localEntBone'] = function(target,pos,ent,endPos)
+  ['localEntBone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not ent then
       return false
     end
@@ -100,18 +100,18 @@ local typeChecks = {
       return false
     end
 
-    if #(pos - endPos) > target.radius then
+    if targetDist > target.radius then
       return false
     end
 
-    if #(GetWorldPositionOfEntityBone(ent,target.bone) - pos) <= target.radius then
-      return true
+    if #(GetWorldPositionOfEntityBone(ent,target.bone) - pos) > target.radius then
+      return false
     end
 
-    return false
+    return true
   end,
 
-  ['netEntBone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId)
+  ['netEntBone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not ent then
       return false
     end
@@ -120,18 +120,18 @@ local typeChecks = {
       return false
     end
 
-    if #(pos - endPos) > target.radius then
+    if targetDist > target.radius then
       return false
     end
 
-    if #(GetWorldPositionOfEntityBone(ent,target.bone) - pos) <= target.radius then
-      return true
+    if #(GetWorldPositionOfEntityBone(ent,target.bone) - pos) > target.radius then
+      return false
     end
 
-    return false
+    return true
   end,
 
-  ['modelBone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId)
+  ['modelBone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not ent then
       return false
     end
@@ -140,32 +140,95 @@ local typeChecks = {
       return false
     end
 
-    if #(pos - endPos) > target.radius then
+    if targetDist > target.radius then
       return false
     end
 
     local boneIndex = GetEntityBoneIndexByName(ent,target.bone)
     local bonePos = GetWorldPositionOfEntityBone(ent,boneIndex)
 
-    if #(pos - bonePos) <= target.radius then
-      return true
+    if #(pos - bonePos) > target.radius then
+      return false
     end
 
-    return false
+    return true
   end,
+
+  ['player'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if not ent
+    or not entityType ~= 1 
+    then
+      return false
+    end
+
+    if targetDist > target.radius then
+      return false
+    end
+
+    if not IsPedAPlayer(ent) then
+      return false
+    end
+
+    return true
+  end,
+
+  ['ped'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if not ent
+    or not entityType ~= 1 
+    then
+      return false
+    end
+
+    if targetDist > target.radius then
+      return false
+    end
+
+    if IsPedAPlayer(ent) then
+      return false
+    end
+
+    return true
+  end,
+
+  ['vehicle'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if not ent
+    or not entityType ~= 2 
+    then
+      return false
+    end
+
+    if targetDist > target.radius then
+      return false
+    end
+
+    return true
+  end,
+
+  ['object'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if not ent
+    or not entityType ~= 3 
+    then
+      return false
+    end
+
+    if targetDist > target.radius then
+      return false
+    end
+
+    return true
+  end
 }
 
 local function onSelect(target,option,...)
   if option.onSelect then
-    return pcall(selectMethods[type(option.onSelect)],option,target,option,...)
+    return selectMethods[type(option.onSelect)](option,target,option,...)
   end
 
-  return pcall(selectMethods[type(target.onSelect)],target,target,option,...)
+  return selectMethods[type(target.onSelect)](target,target,option,...)
 end
 
 local function shouldTargetRender(target,...)
-  local res,ret,err = pcall(typeChecks[target.type],target,...)
-  return ret
+  return typeChecks[target.type](target,...)
 end
 
 local function sendUiConfig()
@@ -219,11 +282,12 @@ end
 local function checkActiveTargets()
   local pos = GetEntityCoords(playerPed)
   local hit,endPos,entityHit = s2w.get(-1,playerPed,0)
-  local entityModel,netId,isNetworked = false,false,false
+  local entityModel,netId,isNetworked,targetDist,entityType = false,false,false,false,false
 
   if isEntityValid(entityHit) and GetEntityType(entityHit) ~= 0 then
     entityModel = GetEntityModel(entityHit)%0x100000000
     isNetworked = NetworkGetEntityIsNetworked(entityHit)
+    entityType  = GetEntityType(entityHit)
 
     if isNetworked then
       netId = NetworkGetNetworkIdFromEntity(entityHit)
@@ -236,9 +300,11 @@ local function checkActiveTargets()
   local newTargets = {}
   local didChange = false
 
+  targetDist = #(endPos - pos)
+
   for _,target in ipairs(targets) do
     if target then
-      if shouldTargetRender(target,pos,entityHit,endCoords,entityModel,netId,isNetworked) then
+      if shouldTargetRender(target,pos,entityHit,endCoords,entityModel,isNetworked,netId,targetDist,entityType) then
         table.insert(newTargets,target)
 
         if not activeTargets[target.id] then
@@ -677,6 +743,54 @@ local apiFunctions = {
     end
 
     return table.unpack(targetIds)
+  end,
+
+  ['addPlayer'] = function(...)  
+    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
+
+    addTarget({
+      id        = id,
+      type      = 'player',
+      title     = title,
+      icon      = icon,
+      radius    = radius or Config.defaultRadius,
+      onSelect  = onSelect,
+      items     = items,
+      vars      = vars,
+      resource  = GetInvokingResource()
+    })
+  end,
+
+  ['addVehicle'] = function(...)  
+    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
+
+    addTarget({
+      id        = id,
+      type      = 'vehicle',
+      title     = title,
+      icon      = icon,
+      radius    = radius or Config.defaultRadius,
+      onSelect  = onSelect,
+      items     = items,
+      vars      = vars,
+      resource  = GetInvokingResource()
+    })
+  end,
+
+  ['addObject'] = function(...)  
+    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
+
+    addTarget({
+      id        = id,
+      type      = 'object',
+      title     = title,
+      icon      = icon,
+      radius    = radius or Config.defaultRadius,
+      onSelect  = onSelect,
+      items     = items,
+      vars      = vars,
+      resource  = GetInvokingResource()
+    })
   end,
 
   ['remove'] = removeTarget

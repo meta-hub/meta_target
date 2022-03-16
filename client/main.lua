@@ -338,16 +338,16 @@ local function targetUi()
   uiFocus = true
 end
 
-Citizen.CreateThread(function()
-  local control = gameName == 'redm' and 0x580C4473 or 37
+Citizen.CreateThread(function()  
+  local control        = gameName == 'redm' and 0x580C4473 or 37
+  local revealControl  = gameName == 'redm' and 0x07CE1E61 or 24
 
   while true do
     Wait(0)
 
     if gameName == 'redm' then
-      DisableControlAction(0,control)
-      
-      DisableControlAction(0,0x07CE1E61)
+      DisableControlAction(0,control)      
+      DisableControlAction(0,revealControl)
       DisableControlAction(0,0x0F39B3D4)
     else
       DisableControlAction(0,control)

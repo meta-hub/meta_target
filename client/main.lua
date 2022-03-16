@@ -30,6 +30,10 @@ local typeChecks = {
       return false
     end
 
+    if #(endPos - target.point) > target.radius then
+      return false
+    end
+
     return true
   end,
 
@@ -203,7 +207,7 @@ local typeChecks = {
 
     return true
   end,
-
+  
   ['object'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not ent
     or not entityType ~= 3 

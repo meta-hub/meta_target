@@ -441,7 +441,7 @@ local function evalArgs(argOrder,idOrOpts,...)
     local res = {}
 
     for _,arg in ipairs(argOrder) do
-      table.insert(res,idOrOpts[arg])
+      table.insert(res,idOrOpts[arg] or false)
     end
 
     return table.unpack(res)

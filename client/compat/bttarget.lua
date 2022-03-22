@@ -58,7 +58,7 @@ local exports = {
   end,
 
   RemoveZone = function(name)
-    return mTarget.remove(name)
+    return mTarget.removeTarget(name)
   end
 }
 

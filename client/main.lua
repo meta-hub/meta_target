@@ -3,8 +3,10 @@ local activeTargets = {}
 local idIndexMap = {}
 local isOpen
 local cfgSent
+local uiFocus
 
-local endCoords,entHit = vec3(0,0,0),0
+local endCoords = vec3(0,0,0)
+local entHit = 0
 
 local function getEndCoords()
   return endCoords
@@ -268,10 +270,28 @@ local function closeUi()
   SetNuiFocus(false,false)
 end
 
+local function cleanse(t)
+  local res = {}
+
+  for k,v in pairs(t) do
+    local t = type(v)
+
+    if t == 'table' then
+      res[k] = cleanse(v)
+    elseif t == 'function' then
+      res[k] = false
+    else
+      res[k] = v
+    end
+  end
+
+  return res
+end
+
 local function updateUi(targets)
   SendNUIMessage({
     type = 'setTargets',
-    targets = targets
+    targets = cleanse(targets)
   })
 end
 
@@ -331,9 +351,6 @@ local function checkActiveTargets()
   end
 end
 
-local gameName = GetGameName()
-local uiFocus
-
 local function targetUi()
   Wait(0)
 
@@ -343,8 +360,9 @@ local function targetUi()
 end
 
 Citizen.CreateThread(function()  
-  local control        = gameName == 'redm' and 0x580C4473 or 37
-  local revealControl  = gameName == 'redm' and 0x07CE1E61 or 24
+  local gameName      = GetGameName()
+  local control       = gameName == 'redm' and 0x580C4473 or 37
+  local revealControl = gameName == 'redm' and 0x07CE1E61 or 24
 
   while true do
     Wait(0)
@@ -428,7 +446,9 @@ local function addTarget(target)
   return targetIndex
 end
 
-local function removeTarget(...)
+mTarget = {}
+
+function mTarget.removeTarget(...)
   for i=1,select("#",...),1 do
     local id = select(i,...)
     local index = idIndexMap[id]
@@ -440,22 +460,7 @@ local function removeTarget(...)
   end
 end
 
-local function evalArgs(argOrder,idOrOpts,...)
-  if type(idOrOpts) == 'table' then
-    local res = {}
-
-    for _,arg in ipairs(argOrder) do
-      table.insert(res,idOrOpts[arg] or false)
-    end
-
-    return table.unpack(res)
-  end
-
-  return idOrOpts,...
-end
-
-local function addModel(...)
-  local id,title,icon,model,radius,onSelect,items,vars = evalArgs({'id','title','icon','model','radius','onSelect','items','vars'},...)
+function mTarget.addModel(id,title,icon,model,radius,onSelect,items,vars)
   local hash = (type(model) == 'number' and model or GetHashKey(model))%0x100000000
 
   addTarget({
@@ -473,48 +478,7 @@ local function addModel(...)
   })
 end
 
-local function addLocalEntBone(...)
-  local id,title,icon,entId,bone,radius,onSelect,items,vars = evalArgs({'id','title','icon','entId','bone','radius','onSelect','items','vars'},...)
-  local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
-
-  addTarget({
-    id        = id,
-    type      = 'localEntBone',
-    title     = title,
-    icon      = icon,
-    entId     = entId,
-    hash      = modelHash,
-    bone      = bone,
-    radius    = radius or Config.defaultRadius,
-    onSelect  = onSelect,
-    items     = items,
-    vars      = vars,
-    resource  = GetInvokingResource()
-  })
-end
-
-local function addNetEntBone(...)
-  local id,title,icon,netId,bone,radius,onSelect,items,vars = evalArgs({'id','title','icon','netId','bone','radius','onSelect','items','vars'},...)
-  local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
-
-  addTarget({
-    id        = id,
-    type      = 'netEntBone',
-    title     = title,
-    icon      = icon,
-    netId     = netId,
-    hash      = modelHash,
-    bone      = bone,
-    radius    = radius or Config.defaultRadius,
-    onSelect  = onSelect,
-    items     = items,
-    vars      = vars,
-    resource  = GetInvokingResource()
-  })
-end
-
-local function addModelBone(...)
-  local id,title,icon,model,bone,radius,onSelect,items,vars = evalArgs({'id','title','icon','model','bone','radius','onSelect','items','vars'},...)
+function mTarget.addModelBone(id,title,icon,model,bone,radius,onSelect,items,vars)
   local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
@@ -533,278 +497,277 @@ local function addModelBone(...)
   })
 end
 
-local apiFunctions = {
-  ['addPoint'] = function(...)
-    local id,title,icon,point,radius,onSelect,items,vars = evalArgs({'id','title','icon','point','radius','onSelect','items','vars'},...)
+function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,vars)
+  local targetIds = {}
 
-    addTarget({
-      id        = id,
-      type      = 'point',
-      title     = title,
-      icon      = icon,
-      point     = point,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    })
-  end,
+  for i=1,#bones do
+    local targetId = id .. ":" .. i
 
-  ['addModel'] = addModel,
+    mTarget.addModelBone(targetId,title,icon,model,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
 
-  ['addModels'] = function(...)
-    local targetIds = {}
+    table.insert(targetIds,targetId)
+  end
 
-    local id,title,icon,models,radius,onSelect,items,vars = evalArgs({'id','title','icon','models','radius','onSelect','items','vars'},...)
+  return table.unpack(targetIds)
+end
 
-    for i=1,#models do
-      local targetId = id .. ":" .. i
+function mTarget.addPoint(id,title,icon,point,radius,onSelect,items,vars)
+  addTarget({
+    id        = id,
+    type      = 'point',
+    title     = title,
+    icon      = icon,
+    point     = point,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  })
+end
 
-      addModel(targetId,title,icon,models[i],radius or Config.defaultRadius,onSelect,items,vars)
+function mTarget.addModels(id,title,icon,models,radius,onSelect,items,vars)
+  local targetIds = {}
 
-      table.insert(targetIds,targetId)
-    end
+  for i=1,#models do
+    local targetId = id .. ":" .. i
 
-    return table.unpack(targetIds)
-  end,
+    mTarget.addModel(targetId,title,icon,models[i],radius or Config.defaultRadius,onSelect,items,vars)
 
-  ['addNetEnt'] = function(...)
-    local id,title,icon,netId,radius,onSelect,items,vars = evalArgs({'id','title','icon','netId','radius','onSelect','items','vars'},...)
+    table.insert(targetIds,targetId)
+  end
 
-    addTarget({
-      id        = id,
-      type      = 'networkEnt',
-      title     = title,
-      icon      = icon,
-      netId     = netId,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    })
-  end,
+  return table.unpack(targetIds)
+end
 
-  ['addLocalEnt'] = function(...)
-    local id,title,icon,entId,radius,onSelect,items,vars = evalArgs({'id','title','icon','entId','radius','onSelect','items','vars'},...)
+function mTarget.addNetEnt(id,title,icon,netId,radius,onSelect,items,vars)
+  addTarget({
+    id        = id,
+    type      = 'networkEnt',
+    title     = title,
+    icon      = icon,
+    netId     = netId,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  })
+end
 
-    addTarget({
-      id        = id,
-      type      = 'localEnt',
-      title     = title,
-      icon      = icon,
-      entId     = entId,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    })
-  end,
+function mTarget.addLocalEnt(id,title,icon,entId,radius,onSelect,items,vars)
+  print(id,title,icon,entId,radius,onSelect,items,vars)
+  addTarget({
+    id        = id,
+    type      = 'localEnt',
+    title     = title,
+    icon      = icon,
+    entId     = entId,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  })
+end
 
-  ['addInternalPoly'] = function(...)
-    local id,title,icon,points,options,radius,onSelect,items,vars = evalArgs({'id','title','icon','points','options','radius','onSelect','items','vars'},...)
+function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,items,vars)
+  local target = {
+    id        = id,
+    type      = 'polyZone',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  }
 
-    local target = {
-      id        = id,
-      type      = 'polyZone',
-      title     = title,
-      icon      = icon,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    }
+  local polyZone = PolyZone:Create(points,options)
 
-    local polyZone = PolyZone:Create(points,options)
+  polyZone:onPointInOut(getEndCoords,function(isPointInside,point)
+    target.isInside = isPointInside
+  end,500)
 
-    polyZone:onPointInOut(getEndCoords,function(isPointInside,point)
-      target.isInside = isPointInside
-    end,500)
+  addTarget(target)
+end
 
-    addTarget(target)
-  end,
+function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars)
+  local target = {
+    id        = id,
+    type      = 'polyZone',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  }
 
-  ['addExternalPoly'] = function(...)
-    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
+  addTarget(target)
 
-    local target = {
-      id        = id,
-      type      = 'polyZone',
-      title     = title,
-      icon      = icon,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    }
+  return function(isInside)    
+    target.isInside = isInside
+  end
+end
 
-    addTarget(target)
+function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,radius,onSelect,items,vars)    
+  local target = {
+    id        = id,
+    type      = 'polyZone',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  }
 
-    return function(isInside)    
-      target.isInside = isInside
-    end
-  end,
+  local boxZone = BoxZone:Create(center,length,width,options)
 
-  ['addInternalBoxZone'] = function(...)
-    local id,title,icon,center,length,width,options,radius,onSelect,items,vars = evalArgs({'id','title','icon','center','length','width','options','radius','onSelect','items','vars'},...)
+  boxZone:onPointInOut(getEndCoords,function(isPointInside,point)
+    target.isInside = isPointInside
+  end,500)
 
-    local target = {
-      id        = id,
-      type      = 'polyZone',
-      title     = title,
-      icon      = icon,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    }
+  addTarget(target)
+end
 
-    local boxZone = BoxZone:Create(center,length,width,options)
+function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars)
+  local target = {
+    id        = id,
+    type      = 'polyZone',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  }
 
-    boxZone:onPointInOut(getEndCoords,function(isPointInside,point)
-      target.isInside = isPointInside
-    end,500)
+  addTarget(target)
 
-    addTarget(target)
-  end,
+  return function(isInside)    
+    target.isInside = isInside
+  end
+end
 
-  ['addExternalBoxZone'] = function(...)
-    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
+function mTarget.addNetEntBone(id,title,icon,netId,bone,radius,onSelect,items,vars)
+  local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
-    local target = {
-      id        = id,
-      type      = 'polyZone',
-      title     = title,
-      icon      = icon,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    }
+  addTarget({
+    id        = id,
+    type      = 'netEntBone',
+    title     = title,
+    icon      = icon,
+    netId     = netId,
+    hash      = modelHash,
+    bone      = bone,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  })
+end
 
-    addTarget(target)
+function mTarget.addNetEntBones(id,title,icon,netId,bones,radius,onSelect,items,vars)
+  local targetIds = {}
 
-    return function(isInside)    
-      target.isInside = isInside
-    end
-  end,
+  for i=1,#bones do
+    local targetId = id .. ":" .. i
 
-  ['addNetEntBone'] = addNetEntBone,
+    mTarget.addNetEntBone(targetId,title,icon,netId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
 
-  ['addNetEntBones'] = function(...)
-    local targetIds = {}
+    table.insert(targetIds,targetId)
+  end
 
-    local id,title,icon,netId,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','netId','bones','radius','onSelect','items','vars'},...)
+  return table.unpack(targetIds)
+end
 
-    for i=1,#bones do
-      local targetId = id .. ":" .. i
+function mTarget.addLocalEntBone(id,title,icon,entId,bone,radius,onSelect,items,vars)
+  local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
-      addNetEntBone(targetId,title,icon,netId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+  addTarget({
+    id        = id,
+    type      = 'localEntBone',
+    title     = title,
+    icon      = icon,
+    entId     = entId,
+    hash      = modelHash,
+    bone      = bone,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  })
+end
 
-      table.insert(targetIds,targetId)
-    end
+function mTarget.addLocalEntBones(id,title,icon,entId,bones,radius,onSelect,items,vars)
+  local targetIds = {}
 
-    return table.unpack(targetIds)
-  end,
+  for i=1,#bones do
+    local targetId = id .. ":" .. i
 
-  ['addLocalEntBone'] = addLocalEntBone,
+    mTarget.addLocalEntBone(targetId,title,icon,entId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
 
-  ['addLocalEntBones'] = function(...)
-    local targetIds = {}
+    table.insert(targetIds,targetId)
+  end
 
-    local id,title,icon,entId,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','entId','bones','radius','onSelect','items','vars'},...)
+  return table.unpack(targetIds)
+end
 
-    for i=1,#bones do
-      local targetId = id .. ":" .. i
+function mTarget.addPlayer(id,title,icon,radius,onSelect,items,vars)
+  addTarget({
+    id        = id,
+    type      = 'player',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  })
+end
 
-      addLocalEntBone(targetId,title,icon,entId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+function mTarget.addVehicle(id,title,icon,radius,onSelect,items,vars)
+  addTarget({
+    id        = id,
+    type      = 'vehicle',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  })
+end
 
-      table.insert(targetIds,targetId)
-    end
-
-    return table.unpack(targetIds)
-  end,
-
-  ['addModelBone'] = addModelBone,
-
-  ['addModelBones'] = function(...)
-    local targetIds = {}
-
-    local id,title,icon,model,bones,radius,onSelect,items,vars = evalArgs({'id','title','icon','model','bones','radius','onSelect','items','vars'},...)
-
-    for i=1,#bones do
-      local targetId = id .. ":" .. i
-
-      addModelBone(targetId,title,icon,model,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
-
-      table.insert(targetIds,targetId)
-    end
-
-    return table.unpack(targetIds)
-  end,
-
-  ['addPlayer'] = function(...)  
-    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
-
-    addTarget({
-      id        = id,
-      type      = 'player',
-      title     = title,
-      icon      = icon,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    })
-  end,
-
-  ['addVehicle'] = function(...)  
-    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
-
-    addTarget({
-      id        = id,
-      type      = 'vehicle',
-      title     = title,
-      icon      = icon,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    })
-  end,
-
-  ['addObject'] = function(...)  
-    local id,title,icon,radius,onSelect,items,vars = evalArgs({'id','title','icon','radius','onSelect','items','vars'},...)
-
-    addTarget({
-      id        = id,
-      type      = 'object',
-      title     = title,
-      icon      = icon,
-      radius    = radius or Config.defaultRadius,
-      onSelect  = onSelect,
-      items     = items,
-      vars      = vars,
-      resource  = GetInvokingResource()
-    })
-  end,
-
-  ['remove'] = removeTarget
-}
+function mTarget.addObject(id,title,icon,radius,onSelect,items,vars)
+  addTarget({
+    id        = id,
+    type      = 'object',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = GetInvokingResource()
+  })
+end
 
 local exportNames = {}
 
-for exportName,fn in pairs(apiFunctions) do
-  exports(exportName,fn)
-  exportNames[#exportNames+1] = exportName
+for fnName,fn in pairs(mTarget) do
+  exports(fnName,fn)
+  exportNames[#exportNames+1] = fnName
 end
 
 exports('getExportNames',function()

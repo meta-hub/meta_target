@@ -17,6 +17,7 @@ client_scripts {
   'config.lua',
   'client/s2w.lua',
   'client/main.lua',
+  'client/compat/*.lua',
   --'client/examples.lua',
 }
 
@@ -28,3 +29,6 @@ files {
 dependencies {
   'PolyZone'
 }
+
+provide 'bt-target'
+provide 'fivem-target'

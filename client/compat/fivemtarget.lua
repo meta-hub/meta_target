@@ -38,7 +38,7 @@ local exports = {
   end,
 
   RemoveTargetPoint = function(name)
-    return mTarget.remove(name)
+    return mTarget.removeTarget(name)
   end
 }
 

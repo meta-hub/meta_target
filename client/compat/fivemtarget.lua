@@ -6,35 +6,33 @@ end
 
 local function onSelect(opts)
   return function(targetData,itemData,entHit)
-    print('CeeBee',targetData.id,itemData.name,targetData.vars,entHit)
     opts.onInteract(targetData.id,itemData.name,targetData.vars or {},entHit)
   end
 end
 
 local exports = {
   AddTargetEntity = function(opts)
-    return mTarget.addNetEnt(opts.name,opts.label,opts.icon,opts.netId,opts.interactDist or false,onSelect(opts),opts.options,opts.vars) 
+    return mTarget.addNetEnt(opts.name,opts.label,opts.icon,opts.netId,opts.interactDist or false,onSelect(opts),opts.options,opts.vars,GetInvokingResource()) 
   end,
 
   AddTargetLocalEntity = function(opts)
-    print(json.encode(opts,{indent = true}))
-    return mTarget.addLocalEnt(opts.name,opts.label,opts.icon,opts.entId,opts.interactDist or false,onSelect(opts),opts.options,opts.vars)
+    return mTarget.addLocalEnt(opts.name,opts.label,opts.icon,opts.entId,opts.interactDist or false,onSelect(opts),opts.options,opts.vars,GetInvokingResource())
   end,
 
   AddTargetPoint = function(opts) 
-    return mTarget.addPoint(opts.name,opts.label,opts.icon,opts.point,opts.interactDist or false,onSelect(opts),opts.options,opts.vars)
+    return mTarget.addPoint(opts.name,opts.label,opts.icon,opts.point,opts.interactDist or false,onSelect(opts),opts.options,opts.vars,GetInvokingResource())
   end,
 
   AddTargetModel = function(opts) 
-    return mTarget.addModel(opts.name,opts.label,opts.icon,opts.model,opts.interactDist or false,onSelect(opts),opts.options,opts.vars)
+    return mTarget.addModel(opts.name,opts.label,opts.icon,opts.model,opts.interactDist or false,onSelect(opts),opts.options,opts.vars,GetInvokingResource())
   end,
 
   AddTargetModels = function(opts) 
-    return mTarget.addModels(opts.name,opts.label,opts.icon,opts.models,opts.interactDist or false,onSelect(opts),opts.options,opts.vars)
+    return mTarget.addModels(opts.name,opts.label,opts.icon,opts.models,opts.interactDist or false,onSelect(opts),opts.options,opts.vars,GetInvokingResource())
   end,
 
   AddPolyZone = function(opts)
-    return mTarget.addExternalPoly(opts.name,opts.label,opts.icon,opts.interactDist or false,onSelect(opts),opts.options,opts.vars)
+    return mTarget.addExternalPoly(opts.name,opts.label,opts.icon,opts.interactDist or false,onSelect(opts),opts.options,opts.vars,GetInvokingResource())
   end,
 
   RemoveTargetPoint = function(name)

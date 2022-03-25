@@ -1,5 +1,5 @@
 Config = {
-  defaultRadius = 5.0,
+  defaultRadius = 50.0,
 
   colors = {
     -- note: dont edit key/index, aligns with html

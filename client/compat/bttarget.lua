@@ -15,7 +15,7 @@ local exports = {
       })
     end
 
-    return mTarget.addPoint(name,name:upper(),targetOptions.options[1].icon,center,radius,false,items)
+    return mTarget.addPoint(name,name:upper(),targetOptions.options[1].icon,center,radius,false,items,{},GetInvokingResource())
   end,
 
   AddBoxZone = function(name,center,length,width,options,targetOptions)
@@ -28,7 +28,7 @@ local exports = {
       })
     end
 
-    return mTarget.addInternalBoxZone(name,name:upper(),targetOptions.options[1].icon,center,length,width,options,targetOptions.distance or false,false,items)
+    return mTarget.addInternalBoxZone(name,name:upper(),targetOptions.options[1].icon,center,length,width,options,targetOptions.distance or false,false,items,{},GetInvokingResource())
   end,
 
   AddPolyZone = function(name,points,options,targetOptions)
@@ -41,7 +41,7 @@ local exports = {
       })
     end
 
-    return mTarget.addInternalPoly(name,name:upper(),targetOptions.options[1].icon,points,options,targetOptions.distance or false,false,items)
+    return mTarget.addInternalPoly(name,name:upper(),targetOptions.options[1].icon,points,options,targetOptions.distance or false,false,items,{},GetInvokingResource())
   end,
 
   AddTargetModel = function(models,targetOptions)
@@ -54,7 +54,7 @@ local exports = {
       })
     end
 
-    return mTarget.addModels(name,name:upper(),targetOptions.options[1].icon,models,targetOptions.distance or false,false,items)
+    return mTarget.addModels(name,name:upper(),targetOptions.options[1].icon,models,targetOptions.distance or false,false,items,{},GetInvokingResource())
   end,
 
   RemoveZone = function(name)

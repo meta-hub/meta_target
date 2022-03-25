@@ -94,7 +94,11 @@ local typeChecks = {
       return false
     end
 
-    return (targetDist <= target.radius)
+    if targetDist > target.radius then
+      return false
+    end
+
+    return true
   end,
 
   ['localEntBone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
@@ -303,6 +307,8 @@ local function isEntityValid(ent)
   return DoesEntityExist(ent)
 end
 
+local didChange = false
+
 local function checkActiveTargets()
   local pos = GetEntityCoords(playerPed)
   local hit,endPos,entityHit = s2w.get(-1,playerPed,0)
@@ -322,25 +328,22 @@ local function checkActiveTargets()
   entHit = entityHit
 
   local newTargets = {}
-  local didChange = false
 
   targetDist = #(endPos - pos)
 
   for _,target in ipairs(targets) do
-    if target then
+    if not target.inactive then
       if shouldTargetRender(target,pos,entityHit,endCoords,entityModel,isNetworked,netId,targetDist,entityType) then
         table.insert(newTargets,target)
 
         if not activeTargets[target.id] then
           activeTargets[target.id] = true
           didChange = true
-          break
         end
       else
         if activeTargets[target.id] then
           activeTargets[target.id] = nil
           didChange = true
-          break
         end
       end
     end
@@ -348,6 +351,7 @@ local function checkActiveTargets()
 
   if didChange then
     updateUi(newTargets)
+    didChange = false
   end
 end
 
@@ -454,13 +458,18 @@ function mTarget.removeTarget(...)
     local index = idIndexMap[id]
 
     if index then
-      idIndexMap[id] = nil
-      targets[index] = false
+      targets[index].inactive = true
+
+      if activeTargets[id] then
+        activeTargets[id] = nil
+        didChange = true
+        break
+      end
     end
   end
 end
 
-function mTarget.addModel(id,title,icon,model,radius,onSelect,items,vars)
+function mTarget.addModel(id,title,icon,model,radius,onSelect,items,vars,res)
   local hash = (type(model) == 'number' and model or GetHashKey(model))%0x100000000
 
   addTarget({
@@ -474,11 +483,11 @@ function mTarget.addModel(id,title,icon,model,radius,onSelect,items,vars)
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 
-function mTarget.addModelBone(id,title,icon,model,bone,radius,onSelect,items,vars)
+function mTarget.addModelBone(id,title,icon,model,bone,radius,onSelect,items,vars,res)
   local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
@@ -493,17 +502,17 @@ function mTarget.addModelBone(id,title,icon,model,bone,radius,onSelect,items,var
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 
-function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,vars)
+function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,vars,res)
   local targetIds = {}
 
   for i=1,#bones do
     local targetId = id .. ":" .. i
 
-    mTarget.addModelBone(targetId,title,icon,model,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+    mTarget.addModelBone(targetId,title,icon,model,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res)
 
     table.insert(targetIds,targetId)
   end
@@ -511,7 +520,7 @@ function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,v
   return table.unpack(targetIds)
 end
 
-function mTarget.addPoint(id,title,icon,point,radius,onSelect,items,vars)
+function mTarget.addPoint(id,title,icon,point,radius,onSelect,items,vars,res)
   addTarget({
     id        = id,
     type      = 'point',
@@ -522,17 +531,17 @@ function mTarget.addPoint(id,title,icon,point,radius,onSelect,items,vars)
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 
-function mTarget.addModels(id,title,icon,models,radius,onSelect,items,vars)
+function mTarget.addModels(id,title,icon,models,radius,onSelect,items,vars,res)
   local targetIds = {}
 
   for i=1,#models do
     local targetId = id .. ":" .. i
 
-    mTarget.addModel(targetId,title,icon,models[i],radius or Config.defaultRadius,onSelect,items,vars)
+    mTarget.addModel(targetId,title,icon,models[i],radius or Config.defaultRadius,onSelect,items,vars,res)
 
     table.insert(targetIds,targetId)
   end
@@ -540,7 +549,7 @@ function mTarget.addModels(id,title,icon,models,radius,onSelect,items,vars)
   return table.unpack(targetIds)
 end
 
-function mTarget.addNetEnt(id,title,icon,netId,radius,onSelect,items,vars)
+function mTarget.addNetEnt(id,title,icon,netId,radius,onSelect,items,vars,res)
   addTarget({
     id        = id,
     type      = 'networkEnt',
@@ -551,12 +560,11 @@ function mTarget.addNetEnt(id,title,icon,netId,radius,onSelect,items,vars)
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 
-function mTarget.addLocalEnt(id,title,icon,entId,radius,onSelect,items,vars)
-  print(id,title,icon,entId,radius,onSelect,items,vars)
+function mTarget.addLocalEnt(id,title,icon,entId,radius,onSelect,items,vars,res)
   addTarget({
     id        = id,
     type      = 'localEnt',
@@ -567,11 +575,11 @@ function mTarget.addLocalEnt(id,title,icon,entId,radius,onSelect,items,vars)
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 
-function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,items,vars)
+function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,items,vars,res)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -581,7 +589,7 @@ function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,it
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   }
 
   local polyZone = PolyZone:Create(points,options)
@@ -593,7 +601,7 @@ function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,it
   addTarget(target)
 end
 
-function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars)
+function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars,res)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -603,7 +611,7 @@ function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars)
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   }
 
   addTarget(target)
@@ -613,7 +621,7 @@ function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars)
   end
 end
 
-function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,radius,onSelect,items,vars)    
+function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,radius,onSelect,items,vars,res)    
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -623,7 +631,7 @@ function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,ra
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   }
 
   local boxZone = BoxZone:Create(center,length,width,options)
@@ -635,7 +643,7 @@ function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,ra
   addTarget(target)
 end
 
-function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars)
+function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars,res)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -645,7 +653,7 @@ function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars)
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   }
 
   addTarget(target)
@@ -655,7 +663,7 @@ function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars)
   end
 end
 
-function mTarget.addNetEntBone(id,title,icon,netId,bone,radius,onSelect,items,vars)
+function mTarget.addNetEntBone(id,title,icon,netId,bone,radius,onSelect,items,vars,res)
   local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
@@ -670,17 +678,17 @@ function mTarget.addNetEntBone(id,title,icon,netId,bone,radius,onSelect,items,va
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 
-function mTarget.addNetEntBones(id,title,icon,netId,bones,radius,onSelect,items,vars)
+function mTarget.addNetEntBones(id,title,icon,netId,bones,radius,onSelect,items,vars,res)
   local targetIds = {}
 
   for i=1,#bones do
     local targetId = id .. ":" .. i
 
-    mTarget.addNetEntBone(targetId,title,icon,netId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+    mTarget.addNetEntBone(targetId,title,icon,netId,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res)
 
     table.insert(targetIds,targetId)
   end
@@ -688,7 +696,7 @@ function mTarget.addNetEntBones(id,title,icon,netId,bones,radius,onSelect,items,
   return table.unpack(targetIds)
 end
 
-function mTarget.addLocalEntBone(id,title,icon,entId,bone,radius,onSelect,items,vars)
+function mTarget.addLocalEntBone(id,title,icon,entId,bone,radius,onSelect,items,vars,res)
   local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
@@ -703,17 +711,17 @@ function mTarget.addLocalEntBone(id,title,icon,entId,bone,radius,onSelect,items,
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 
-function mTarget.addLocalEntBones(id,title,icon,entId,bones,radius,onSelect,items,vars)
+function mTarget.addLocalEntBones(id,title,icon,entId,bones,radius,onSelect,items,vars,res)
   local targetIds = {}
 
   for i=1,#bones do
     local targetId = id .. ":" .. i
 
-    mTarget.addLocalEntBone(targetId,title,icon,entId,bones[i],radius or Config.defaultRadius,onSelect,items,vars)
+    mTarget.addLocalEntBone(targetId,title,icon,entId,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res)
 
     table.insert(targetIds,targetId)
   end
@@ -721,7 +729,7 @@ function mTarget.addLocalEntBones(id,title,icon,entId,bones,radius,onSelect,item
   return table.unpack(targetIds)
 end
 
-function mTarget.addPlayer(id,title,icon,radius,onSelect,items,vars)
+function mTarget.addPlayer(id,title,icon,radius,onSelect,items,vars,res)
   addTarget({
     id        = id,
     type      = 'player',
@@ -731,11 +739,11 @@ function mTarget.addPlayer(id,title,icon,radius,onSelect,items,vars)
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 
-function mTarget.addVehicle(id,title,icon,radius,onSelect,items,vars)
+function mTarget.addVehicle(id,title,icon,radius,onSelect,items,vars,res)
   addTarget({
     id        = id,
     type      = 'vehicle',
@@ -745,11 +753,11 @@ function mTarget.addVehicle(id,title,icon,radius,onSelect,items,vars)
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 
-function mTarget.addObject(id,title,icon,radius,onSelect,items,vars)
+function mTarget.addObject(id,title,icon,radius,onSelect,items,vars,res)
   addTarget({
     id        = id,
     type      = 'object',
@@ -759,7 +767,7 @@ function mTarget.addObject(id,title,icon,radius,onSelect,items,vars)
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
-    resource  = GetInvokingResource()
+    resource  = res or GetInvokingResource()
   })
 end
 

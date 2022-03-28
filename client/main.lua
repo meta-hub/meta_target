@@ -781,3 +781,11 @@ end
 exports('getExportNames',function()
   return exportNames
 end)
+
+AddEventHandler('onClientResourceStop',function(res)
+  for _,target in ipairs(targets) do
+    if target.resource == res then
+      target.inactive = true
+    end
+  end
+end)

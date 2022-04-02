@@ -1,15 +1,26 @@
+-- targets and id mapping
 local targets = {}
 local activeTargets = {}
 local idIndexMap = {}
+
+-- ui
 local isOpen
 local cfgSent
 local uiFocus
 
+-- locals
 local endCoords = vec3(0,0,0)
 local entHit = 0
 
+-- exports
+local exportNames = {}
+
 local function getEndCoords()
   return endCoords
+end
+
+local function getExportNames()
+  return exportNames
 end
 
 local selectMethods = {
@@ -324,8 +335,8 @@ local function checkActiveTargets()
     end
   end
 
-  endCoords = endPos
-  entHit = entityHit
+  endCoords   = endPos
+  entHit      = entityHit
 
   local newTargets = {}
 
@@ -379,28 +390,28 @@ Citizen.CreateThread(function()
       DisableControlAction(0,control)
     end
 
-    if not uiFocus then
-      if isOpen then
-        DisablePlayerFiring(PlayerPedId(), true)
-        checkActiveTargets()
+    if isOpen then
+      DisablePlayerFiring(PlayerPedId(), true)
+      checkActiveTargets()
 
+      if IsDisabledControlJustReleased(0,revealControl)
+      or IsControlJustReleased(0,revealControl)  
+      then
+        targetUi()
+      end
+
+      if not uiFocus then
         if IsDisabledControlJustReleased(0,control)
         or IsControlJustReleased(0,control) 
         then
           closeUi()
         end
-
-        if IsDisabledControlJustReleased(0,revealControl)
-        or IsControlJustReleased(0,revealControl)  
-        then
-          targetUi()
-        end
-      else
-        if IsDisabledControlJustPressed(0,control)
-        or IsControlJustPressed(0,control) 
-        then
-          openUi()
-        end
+      end
+    else
+      if IsDisabledControlJustPressed(0,control)
+      or IsControlJustPressed(0,control) 
+      then
+        openUi()
       end
     end
   end
@@ -413,6 +424,8 @@ RegisterNUICallback('closed',function()
 end)
 
 RegisterNUICallback('select',function(data)
+  print('Selected',data.id,data.index)
+
   data.id     = data.id
   data.index  = tonumber(data.index)+1
   
@@ -422,23 +435,31 @@ RegisterNUICallback('select',function(data)
     return
   end
 
+  print('Active')
+
   local target = targets[idIndexMap[data.id]]
 
   if not target then
     return
   end
 
+  print('Target')
+
   local option = target.items[data.index]
 
   if not option then
     return
   end
+
+  print('Opt')
   
   uiFocus = false
   isOpen  = false
   SetNuiFocus(false,false)
 
   onSelect(target,option,entHit)
+
+  print('Cb')
 end)
 
 local function addTarget(target)
@@ -771,16 +792,13 @@ function mTarget.addObject(id,title,icon,radius,onSelect,items,vars,res)
   })
 end
 
-local exportNames = {}
-
 for fnName,fn in pairs(mTarget) do
   exports(fnName,fn)
   exportNames[#exportNames+1] = fnName
 end
 
-exports('getExportNames',function()
-  return exportNames
-end)
+exports('getEndCoords',getEndCoords)
+exports('getExportNames',getExportNames)
 
 AddEventHandler('onClientResourceStop',function(res)
   for _,target in ipairs(targets) do

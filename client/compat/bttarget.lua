@@ -4,6 +4,8 @@ local function getExportEventName(name)
   return string.format('__cfx_export_%s_%s',exportPrefix,name)
 end
 
+local randomNameId = 0
+
 local exports = {
   AddCircleZone = function(name,center,radius,options,targetOptions)
     local items = {}
@@ -53,6 +55,10 @@ local exports = {
         onSelect = t.event
       })
     end
+
+    randomNameId = randomNameId + 1
+
+    local name = 'bt_model_' .. randomNameId
 
     return mTarget.addModels(name,name:upper(),targetOptions.options[1].icon,models,targetOptions.distance or false,false,items,{},GetInvokingResource())
   end,

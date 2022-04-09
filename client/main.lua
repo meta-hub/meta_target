@@ -1,7 +1,6 @@
 -- targets and id mapping
 local targets = {}
 local activeTargets = {}
-local idIndexMap = {}
 
 -- ui
 local isOpen
@@ -9,6 +8,7 @@ local cfgSent
 local uiFocus
 
 -- locals
+local plyPos = vec3(0,0,0)
 local endCoords = vec3(0,0,0)
 local entHit = 0
 
@@ -335,6 +335,7 @@ local function checkActiveTargets()
     end
   end
 
+  plyPos      = pos
   endCoords   = endPos
   entHit      = entityHit
 
@@ -343,19 +344,17 @@ local function checkActiveTargets()
   targetDist = #(endPos - pos)
 
   for _,target in ipairs(targets) do
-    if not target.inactive then
-      if shouldTargetRender(target,pos,entityHit,endCoords,entityModel,isNetworked,netId,targetDist,entityType) then
-        table.insert(newTargets,target)
+    if shouldTargetRender(target,pos,entityHit,endCoords,entityModel,isNetworked,netId,targetDist,entityType) then
+      table.insert(newTargets,target)
 
-        if not activeTargets[target.id] then
-          activeTargets[target.id] = true
-          didChange = true
-        end
-      else
-        if activeTargets[target.id] then
-          activeTargets[target.id] = nil
-          didChange = true
-        end
+      if not activeTargets[target.id] then
+        activeTargets[target.id] = true
+        didChange = true
+      end
+    else
+      if activeTargets[target.id] then
+        activeTargets[target.id] = nil
+        didChange = true
       end
     end
   end
@@ -424,8 +423,6 @@ RegisterNUICallback('closed',function()
 end)
 
 RegisterNUICallback('select',function(data)
-  print('Selected',data.id,data.index)
-
   data.id     = data.id
   data.index  = tonumber(data.index)+1
   
@@ -435,40 +432,34 @@ RegisterNUICallback('select',function(data)
     return
   end
 
-  print('Active')
+  local target
 
-  local target = targets[idIndexMap[data.id]]
+  for _,t in ipairs(targets) do
+    if t.id == data.id then
+      target = t
+      break
+    end
+  end
 
   if not target then
     return
   end
-
-  print('Target')
 
   local option = target.items[data.index]
 
   if not option then
     return
   end
-
-  print('Opt')
   
   uiFocus = false
   isOpen  = false
   SetNuiFocus(false,false)
 
   onSelect(target,option,entHit)
-
-  print('Cb')
 end)
 
 local function addTarget(target)
-  local targetIndex = #targets + 1
-
-  targets[targetIndex] = target
-  idIndexMap[target.id] = targetIndex
-
-  return targetIndex
+  table.insert(targets,target)
 end
 
 mTarget = {}
@@ -476,16 +467,16 @@ mTarget = {}
 function mTarget.removeTarget(...)
   for i=1,select("#",...),1 do
     local id = select(i,...)
-    local index = idIndexMap[id]
-
-    if index then
-      targets[index].inactive = true
-
-      if activeTargets[id] then
-        activeTargets[id] = nil
-        didChange = true
-        break
+    
+    for i=#targets,1,-1 do
+      if targets[i].resource == res then
+        table.remove(targets,i)
       end
+    end
+
+    if activeTargets[id] then
+      activeTargets[id] = nil
+      didChange = true
     end
   end
 end
@@ -801,9 +792,9 @@ exports('getEndCoords',getEndCoords)
 exports('getExportNames',getExportNames)
 
 AddEventHandler('onClientResourceStop',function(res)
-  for _,target in ipairs(targets) do
-    if target.resource == res then
-      target.inactive = true
+  for i=#targets,1,-1 do
+    if targets[i].resource == res then
+      table.remove(targets,i)
     end
   end
 end)

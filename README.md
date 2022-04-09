@@ -1,8 +1,6 @@
 # meta_target
 
 ## ⚠️ Pre-Release ⚠️
-Probably don't use this for now.  
-Export function names __will__ be changed, compatibility __will__ be __broken__.  
 This resource has lacked extensive testing.  
 Development and bug-fixing will be continued, however all features may not work correctly.  
 Please report bugs, incorrect readme instructions/examples, or any other issue you might find, right here on github issues.  
@@ -625,27 +623,4 @@ anything    - any                 (literally any other data you want to pass thr
 ### remove
 ```lua
   target.remove('pinkcage_target')
-```
-
-## Extra notes:
-
-All arguments for 'add' functions can be passed as a key/value pair instead.
-Probably of no use to anybody, but I've added it for easier conversion of from other target resources.
-Keys must be named correctly.
-
-```lua
-target.addPoint({
-  id = 'my_target_point',
-  title = 'Point',
-  icon = 'fas fa-user',
-  point = vector3(12.3,45.6,78.9),
-  radius = 10.0,
-  onInteract = function(target,option)
-  end,
-  items = {
-    {
-      label = 'Sell Warez',
-    }
-  }
-})
 ```

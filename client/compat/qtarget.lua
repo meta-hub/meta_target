@@ -62,7 +62,7 @@ local exports = {
     return mTarget.addInternalPoly(name,name:upper(),targetOptions.options[1].icon,points,options,targetOptions.distance or false,false,items,{},GetInvokingResource())
   end,
 
-  AddEntityZone = function(name,entity,options,targetOptions)
+AddEntityZone = function(name,entity,options,targetOptions)
     local items = {}
 
     for _,t in ipairs(targetOptions.options) do
@@ -72,8 +72,12 @@ local exports = {
       })
     end
 
-    return mTarget.addEntZone(name,name:upper(),targetOptions.options[1].icon,entity,options,targetOptions.distance or false,false,items,{},GetInvokingResource())
-  end,    
+    if NetworkGetEntityIsNetworked(entity) then
+      return mTarget.addNetEnt(name,name:upper(),targetOptions.options[1].icon,entity,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    else
+      return mTarget.addLocalEnt(name,name:upper(),targetOptions.options[1].icon,entity,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    end
+  end    
 
   AddTargetModel = function(models,targetOptions)
     local items = {}

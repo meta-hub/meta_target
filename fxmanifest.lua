@@ -32,3 +32,4 @@ dependencies {
 
 provide 'bt-target'
 provide 'fivem-target'
+provide 'qtarget'

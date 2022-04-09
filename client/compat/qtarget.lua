@@ -173,8 +173,6 @@ local exports = {
 
   Player = function(targetOptions)
     local items = {}
-    local name
-    local title
 
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
@@ -185,8 +183,8 @@ local exports = {
 
     randomNameId = randomNameId + 1
     local name = 'q_player_' .. randomNameId
-    
-    return mTarget.addPlayer(name,title:upper(),targetOptions.options[1].icon,targetOptions.distance or false,false,items,{},GetInvokingResource())
+
+    return mTarget.addPlayer(name,name:upper(),targetOptions.options[1].icon,targetOptions.distance or false,false,items,{},GetInvokingResource())
   end,               
 
   RemoveZone = function(name)

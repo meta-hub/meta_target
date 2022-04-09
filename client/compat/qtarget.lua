@@ -77,7 +77,7 @@ AddEntityZone = function(name,entity,options,targetOptions)
     else
       return mTarget.addLocalEnt(name,name:upper(),targetOptions.options[1].icon,entity,targetOptions.distance or false,false,items,{},GetInvokingResource())
     end
-  end    
+  end,    
 
   AddTargetModel = function(models,targetOptions)
     local items = {}

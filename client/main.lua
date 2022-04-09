@@ -469,7 +469,7 @@ function mTarget.removeTarget(...)
     local id = select(i,...)
     
     for i=#targets,1,-1 do
-      if targets[i].resource == res then
+      if targets[i].id == id then
         table.remove(targets,i)
       end
     end

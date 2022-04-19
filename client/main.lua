@@ -176,9 +176,11 @@ local typeChecks = {
   end,
 
   ['player'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
-    if not ent
-    or not entityType ~= 1 
-    then
+    if not ent then
+      return false
+    end
+
+    if not entityType then
       return false
     end
 
@@ -190,13 +192,17 @@ local typeChecks = {
       return false
     end
 
-    return true
+    if entityType == 1 then
+      return true
+    end
   end,
 
   ['ped'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
-    if not ent
-    or not entityType ~= 1 
-    then
+    if not ent then
+      return false
+    end
+
+    if not entityType then
       return false
     end
 
@@ -208,13 +214,17 @@ local typeChecks = {
       return false
     end
 
-    return true
+    if entityType == 1 then
+      return true
+    end
   end,
 
   ['vehicle'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
-    if not ent
-    or not entityType ~= 2 
-    then
+    if not ent then
+      return false
+    end
+
+    if not entityType then
       return false
     end
 
@@ -222,13 +232,17 @@ local typeChecks = {
       return false
     end
 
-    return true
+    if entityType == 2 then
+      return true
+    end
   end,
   
   ['object'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
-    if not ent
-    or not entityType ~= 3 
-    then
+    if not ent then
+      return false
+    end
+
+    if not entityType then
       return false
     end
 
@@ -236,7 +250,9 @@ local typeChecks = {
       return false
     end
 
-    return true
+    if entityType == 3 then
+      return true
+    end
   end
 }
 

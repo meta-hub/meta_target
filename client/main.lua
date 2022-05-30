@@ -799,6 +799,20 @@ function mTarget.addObject(id,title,icon,radius,onSelect,items,vars,res)
   })
 end
 
+function mTarget.addPed(id,title,icon,radius,onSelect,items,vars,res)
+  addTarget({
+    id        = id,
+    type      = 'ped',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = res or GetInvokingResource()
+  })
+end
+
 for fnName,fn in pairs(mTarget) do
   exports(fnName,fn)
   exportNames[#exportNames+1] = fnName

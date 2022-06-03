@@ -37,6 +37,18 @@ local selectMethods = {
   end
 }
 
+AddEventHandler('onResourceStart', function(resourceName)
+  resourceRestarted(resourceName)
+end)
+
+function resourceRestarted(res)
+  for i = 1, #targets do
+    if targets[i].resource == res then
+      mTarget.removeTarget(targets[i].id)
+    end
+  end
+end
+
 local typeChecks = {
   ['point'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType) 
     if targetDist > target.radius then

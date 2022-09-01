@@ -13,11 +13,17 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
 
-    return mTarget.addPoint(name,name:upper(),targetOptions.options[1].icon,center,radius,false,items,{},GetInvokingResource())
+    return mTarget.addPoint(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,center,radius,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   AddBoxZone = function(name,center,length,width,options,targetOptions)
@@ -26,11 +32,17 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
 
-    return mTarget.addInternalBoxZone(name,name:upper(),targetOptions.options[1].icon,center,length,width,options,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addInternalBoxZone(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,center,length,width,options,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   AddPolyZone = function(name,points,options,targetOptions)
@@ -39,11 +51,17 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
 
-    return mTarget.addInternalPoly(name,name:upper(),targetOptions.options[1].icon,points,options,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addInternalPoly(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,points,options,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   AddComboZone = function(zones,options,targetOptions)
@@ -52,14 +70,20 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
 
     randomNameId = randomNameId + 1
     local name = 'q_czone_' .. randomNameId
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
 
-    return mTarget.addInternalPoly(name,name:upper(),targetOptions.options[1].icon,points,options,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addInternalPoly(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,points,options,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   AddEntityZone = function(name,entity,options,targetOptions)
@@ -68,14 +92,20 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
 
     if NetworkGetEntityIsNetworked(entity) then
-      return mTarget.addNetEnt(name,name:upper(),targetOptions.options[1].icon,entity,targetOptions.distance or false,false,items,{},GetInvokingResource())
+      return mTarget.addNetEnt(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,entity,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
     else
-      return mTarget.addLocalEnt(name,name:upper(),targetOptions.options[1].icon,entity,targetOptions.distance or false,false,items,{},GetInvokingResource())
+      return mTarget.addLocalEnt(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,entity,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
     end
   end,    
 
@@ -85,14 +115,20 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
+    end
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
     end
     
     randomNameId = randomNameId + 1
     local name = 'q_model_' .. randomNameId
 
-    return mTarget.addModels(name,name:upper(),targetOptions.options[1].icon,models,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addModels(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,models,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   AddTargetBone = function(bones,targetOptions)
@@ -101,14 +137,20 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
 
     randomNameId = randomNameId + 1
     local name = 'q_bone_' .. randomNameId
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
     
-    return mTarget.addModelBone(name,name:upper(),targetOptions.options[1].icon,bones,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addModelBone(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,bones,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   AddTargetEntity = function(entities,targetOptions)
@@ -117,14 +159,20 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
 
     randomNameId = randomNameId + 1
     local name = 'q_entity_' .. randomNameId
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
     
-    return mTarget.addLocalEnt(name,name:upper(),targetOptions.options[1].icon,entities,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addLocalEnt(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,entities,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   Ped = function(targetOptions)
@@ -133,14 +181,20 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
     
     randomNameId = randomNameId + 1
     local name = 'q_ped_' .. randomNameId
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
 
-    return mTarget.addPed(name,name:upper(),targetOptions.options[1].icon,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addPed(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   Vehicle = function(targetOptions)
@@ -149,14 +203,20 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
 
     randomNameId = randomNameId + 1
     local name = 'q_vehicle_' .. randomNameId
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
     
-    return mTarget.addVehicle(name,name:upper(),targetOptions.options[1].icon,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addVehicle(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   Object = function(targetOptions)
@@ -165,14 +225,20 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
 
     randomNameId = randomNameId + 1
     local name = 'q_object_' .. randomNameId
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
     
-    return mTarget.addObject(name,name:upper(),targetOptions.options[1].icon,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addObject(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   Player = function(targetOptions)
@@ -181,14 +247,20 @@ local exports = {
     for _,t in ipairs(targetOptions.options) do
       table.insert(items,{
         label = t.label,
+        index = _,
         onSelect = t.event
       })
     end
 
     randomNameId = randomNameId + 1
     local name = 'q_player_' .. randomNameId
+    local NewFunction = function(target,option,entity)
+      if targetOptions.options[option.index].action then
+        targetOptions.options[option.index].action(entity)
+      end
+    end
 
-    return mTarget.addPlayer(name,name:upper(),targetOptions.options[1].icon,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addPlayer(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,targetOptions.distance or false,targetOptions.options[1].action and NewFunction or false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,               
 
   RemoveZone = function(name)

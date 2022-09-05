@@ -17,7 +17,7 @@ local exports = {
       })
     end
 
-    return mTarget.addPoint(name,name:upper(),targetOptions.options[1].icon,center,radius,false,items,{},GetInvokingResource())
+    return mTarget.addPoint(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,center,radius,false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   AddBoxZone = function(name,center,length,width,options,targetOptions)
@@ -30,7 +30,7 @@ local exports = {
       })
     end
 
-    return mTarget.addInternalBoxZone(name,name:upper(),targetOptions.options[1].icon,center,length,width,options,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addInternalBoxZone(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,center,length,width,options,targetOptions.distance or false,false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   AddPolyZone = function(name,points,options,targetOptions)
@@ -43,7 +43,7 @@ local exports = {
       })
     end
 
-    return mTarget.addInternalPoly(name,name:upper(),targetOptions.options[1].icon,points,options,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addInternalPoly(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,points,options,targetOptions.distance or false,false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   AddTargetModel = function(models,targetOptions)
@@ -60,7 +60,7 @@ local exports = {
 
     local name = 'bt_model_' .. randomNameId
 
-    return mTarget.addModels(name,name:upper(),targetOptions.options[1].icon,models,targetOptions.distance or false,false,items,{},GetInvokingResource())
+    return mTarget.addModels(name,targetOptions.title or targetOptions.options[1].label or name:upper(),targetOptions.options[1].icon,models,targetOptions.distance or false,false,items,{},GetInvokingResource(),targetOptions.canShow)
   end,
 
   RemoveZone = function(name)

@@ -300,6 +300,18 @@ local typeChecks = {
   end
 }
 
+AddEventHandler('onResourceStart', function(resourceName)
+  resourceRestarted(resourceName)
+end)
+
+function resourceRestarted(res)
+  for i = 1, #targets do
+    if targets[i].resource == res then
+      mTarget.removeTarget(targets[i].id)
+    end
+  end
+end
+
 local function onSelect(target,option,...)
   if option.onSelect then
     return selectMethods[type(option.onSelect)](option,target,option,...)

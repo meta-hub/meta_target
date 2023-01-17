@@ -206,6 +206,31 @@ local typeChecks = {
       return true
     end
   end,
+  
+  ['bone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if not ent then
+      return false
+    end
+
+    if targetDist > target.radius then
+      return false
+    end
+
+    if entityType == 2 then
+      local boneIndex = GetEntityBoneIndexByName(ent,target.bone)
+      local bonePos = GetWorldPositionOfEntityBone(ent,boneIndex)
+
+      if #(pos - bonePos) > target.radius then
+        return false
+      end
+
+      if target.canInteract then
+        return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      else
+        return true
+      end
+    end
+  end,
 
   ['player'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not ent then

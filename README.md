@@ -1,8 +1,6 @@
 # meta_target
 
 ## Release
-This resource has lacked extensive testing.  
-Development and bug-fixing will be continued, however all features may not work correctly.  
 Please report bugs, incorrect readme instructions/examples, or any other issue you might find, right here on github issues.  
 You can also post any missing features from other targetting resources that you would like added through github issues.
 

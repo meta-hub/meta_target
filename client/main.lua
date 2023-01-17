@@ -47,8 +47,8 @@ local typeChecks = {
       return false
     end
 
-    if target.canShow then
-      return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if target.canInteract then
+      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     else
       return true
     end
@@ -67,8 +67,8 @@ local typeChecks = {
       return false
     end
 
-    if target.canShow then
-      return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if target.canInteract then
+      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     else
       return true
     end
@@ -87,8 +87,8 @@ local typeChecks = {
       return false
     end
 
-    if target.canShow then
-      return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if target.canInteract then
+      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     else
       return true
     end
@@ -109,8 +109,8 @@ local typeChecks = {
       return false
     end
 
-    if target.canShow then
-      return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if target.canInteract then
+      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     else
       return true
     end
@@ -125,8 +125,8 @@ local typeChecks = {
       return false
     end
 
-    if target.canShow then
-      return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if target.canInteract then
+      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     else
       return true
     end
@@ -149,8 +149,8 @@ local typeChecks = {
       return false
     end
 
-    if target.canShow then
-      return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if target.canInteract then
+      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     else
       return true
     end
@@ -173,8 +173,8 @@ local typeChecks = {
       return false
     end
 
-    if target.canShow then
-      return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if target.canInteract then
+      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     else
       return true
     end
@@ -200,8 +200,8 @@ local typeChecks = {
       return false
     end
 
-    if target.canShow then
-      return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+    if target.canInteract then
+      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     else
       return true
     end
@@ -247,8 +247,8 @@ local typeChecks = {
     end
 
     if entityType == 1 then
-      if target.canShow then
-        return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      if target.canInteract then
+        return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
       else
         return true
       end
@@ -269,8 +269,8 @@ local typeChecks = {
     end
 
     if entityType == 2 then
-      if target.canShow then
-        return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      if target.canInteract then
+        return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
       else
         return true
       end
@@ -291,8 +291,8 @@ local typeChecks = {
     end
 
     if entityType == 3 then
-      if target.canShow then
-        return target.canShow(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      if target.canInteract then
+        return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
       else
         return true
       end
@@ -544,7 +544,7 @@ function mTarget.removeTarget(...)
   end
 end
 
-function mTarget.addModel(id,title,icon,model,radius,onSelect,items,vars,res,canShow)
+function mTarget.addModel(id,title,icon,model,radius,onSelect,items,vars,res,canInteract)
   local hash = (type(model) == 'number' and model or GetHashKey(model))%0x100000000
 
   addTarget({
@@ -559,11 +559,11 @@ function mTarget.addModel(id,title,icon,model,radius,onSelect,items,vars,res,can
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addModelBone(id,title,icon,model,bone,radius,onSelect,items,vars,res,canShow)
+function mTarget.addModelBone(id,title,icon,model,bone,radius,onSelect,items,vars,res,canInteract)
   local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
@@ -579,17 +579,17 @@ function mTarget.addModelBone(id,title,icon,model,bone,radius,onSelect,items,var
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,vars,res,canShow)
+function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,vars,res,canInteract)
   local targetIds = {}
 
   for i=1,#bones do
     local targetId = id .. ":" .. i
 
-    mTarget.addModelBone(targetId,title,icon,model,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res,canShow)
+    mTarget.addModelBone(targetId,title,icon,model,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res,canInteract)
 
     table.insert(targetIds,targetId)
   end
@@ -597,7 +597,7 @@ function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,v
   return table.unpack(targetIds)
 end
 
-function mTarget.addPoint(id,title,icon,point,radius,onSelect,items,vars,res,canShow)
+function mTarget.addPoint(id,title,icon,point,radius,onSelect,items,vars,res,canInteract)
   addTarget({
     id        = id,
     type      = 'point',
@@ -609,17 +609,17 @@ function mTarget.addPoint(id,title,icon,point,radius,onSelect,items,vars,res,can
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addModels(id,title,icon,models,radius,onSelect,items,vars,res,canShow)
+function mTarget.addModels(id,title,icon,models,radius,onSelect,items,vars,res,canInteract)
   local targetIds = {}
 
   for i=1,#models do
     local targetId = id .. ":" .. i
 
-    mTarget.addModel(targetId,title,icon,models[i],radius or Config.defaultRadius,onSelect,items,vars,res,canShow)
+    mTarget.addModel(targetId,title,icon,models[i],radius or Config.defaultRadius,onSelect,items,vars,res,canInteract)
 
     table.insert(targetIds,targetId)
   end
@@ -627,7 +627,7 @@ function mTarget.addModels(id,title,icon,models,radius,onSelect,items,vars,res,c
   return table.unpack(targetIds)
 end
 
-function mTarget.addNetEnt(id,title,icon,netId,radius,onSelect,items,vars,res,canShow)
+function mTarget.addNetEnt(id,title,icon,netId,radius,onSelect,items,vars,res,canInteract)
   addTarget({
     id        = id,
     type      = 'networkEnt',
@@ -639,11 +639,11 @@ function mTarget.addNetEnt(id,title,icon,netId,radius,onSelect,items,vars,res,ca
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addLocalEnt(id,title,icon,entId,radius,onSelect,items,vars,res,canShow)
+function mTarget.addLocalEnt(id,title,icon,entId,radius,onSelect,items,vars,res,canInteract)
   addTarget({
     id        = id,
     type      = 'localEnt',
@@ -655,11 +655,11 @@ function mTarget.addLocalEnt(id,title,icon,entId,radius,onSelect,items,vars,res,
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,items,vars,res,canShow)
+function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,items,vars,res,canInteract)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -670,7 +670,7 @@ function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,it
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   }
 
   local polyZone = PolyZone:Create(points,options)
@@ -683,7 +683,7 @@ function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,it
   addTarget(target)
 end
 
-function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars,res,canShow)
+function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars,res,canInteract)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -694,7 +694,7 @@ function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars,res,ca
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   }
 
   addTarget(target)
@@ -704,7 +704,7 @@ function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars,res,ca
   end
 end
 
-function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,radius,onSelect,items,vars,res,canShow)    
+function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,radius,onSelect,items,vars,res,canInteract)    
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -715,7 +715,7 @@ function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,ra
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   }
 
   local boxZone = BoxZone:Create(center,length,width,options)
@@ -728,7 +728,7 @@ function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,ra
   addTarget(target)
 end
 
-function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars,res,canShow)
+function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars,res,canInteract)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -739,7 +739,7 @@ function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars,res
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   }
 
   addTarget(target)
@@ -749,7 +749,7 @@ function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars,res
   end
 end
 
-function mTarget.addNetEntBone(id,title,icon,netId,bone,radius,onSelect,items,vars,res,canShow)
+function mTarget.addNetEntBone(id,title,icon,netId,bone,radius,onSelect,items,vars,res,canInteract)
   local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
@@ -765,17 +765,17 @@ function mTarget.addNetEntBone(id,title,icon,netId,bone,radius,onSelect,items,va
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addNetEntBones(id,title,icon,netId,bones,radius,onSelect,items,vars,res,canShow)
+function mTarget.addNetEntBones(id,title,icon,netId,bones,radius,onSelect,items,vars,res,canInteract)
   local targetIds = {}
 
   for i=1,#bones do
     local targetId = id .. ":" .. i
 
-    mTarget.addNetEntBone(targetId,title,icon,netId,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res,canShow)
+    mTarget.addNetEntBone(targetId,title,icon,netId,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res,canInteract)
 
     table.insert(targetIds,targetId)
   end
@@ -783,7 +783,7 @@ function mTarget.addNetEntBones(id,title,icon,netId,bones,radius,onSelect,items,
   return table.unpack(targetIds)
 end
 
-function mTarget.addLocalEntBone(id,title,icon,entId,bone,radius,onSelect,items,vars,res,canShow)
+function mTarget.addLocalEntBone(id,title,icon,entId,bone,radius,onSelect,items,vars,res,canInteract)
   local modelHash = (type(model) == 'number' and model or GetHashKey(model)) %0x100000000
 
   addTarget({
@@ -799,17 +799,17 @@ function mTarget.addLocalEntBone(id,title,icon,entId,bone,radius,onSelect,items,
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addLocalEntBones(id,title,icon,entId,bones,radius,onSelect,items,vars,res,canShow)
+function mTarget.addLocalEntBones(id,title,icon,entId,bones,radius,onSelect,items,vars,res,canInteract)
   local targetIds = {}
 
   for i=1,#bones do
     local targetId = id .. ":" .. i
 
-    mTarget.addLocalEntBone(targetId,title,icon,entId,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res,canShow)
+    mTarget.addLocalEntBone(targetId,title,icon,entId,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res,canInteract)
 
     table.insert(targetIds,targetId)
   end
@@ -817,7 +817,7 @@ function mTarget.addLocalEntBones(id,title,icon,entId,bones,radius,onSelect,item
   return table.unpack(targetIds)
 end
 
-function mTarget.addPlayer(id,title,icon,radius,onSelect,items,vars,res,canShow)
+function mTarget.addPlayer(id,title,icon,radius,onSelect,items,vars,res,canInteract)
   addTarget({
     id        = id,
     type      = 'player',
@@ -828,11 +828,11 @@ function mTarget.addPlayer(id,title,icon,radius,onSelect,items,vars,res,canShow)
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addVehicle(id,title,icon,radius,onSelect,items,vars,res,canShow)
+function mTarget.addVehicle(id,title,icon,radius,onSelect,items,vars,res,canInteract)
   addTarget({
     id        = id,
     type      = 'vehicle',
@@ -843,11 +843,11 @@ function mTarget.addVehicle(id,title,icon,radius,onSelect,items,vars,res,canShow
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addObject(id,title,icon,radius,onSelect,items,vars,res,canShow)
+function mTarget.addObject(id,title,icon,radius,onSelect,items,vars,res,canInteract)
   addTarget({
     id        = id,
     type      = 'object',
@@ -858,11 +858,11 @@ function mTarget.addObject(id,title,icon,radius,onSelect,items,vars,res,canShow)
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 
-function mTarget.addPed(id,title,icon,radius,onSelect,items,vars,res,canShow)
+function mTarget.addPed(id,title,icon,radius,onSelect,items,vars,res,canInteract)
   addTarget({
     id        = id,
     type      = 'ped',
@@ -873,7 +873,7 @@ function mTarget.addPed(id,title,icon,radius,onSelect,items,vars,res,canShow)
     items     = items,
     vars      = vars,
     resource  = res or GetInvokingResource(),
-    canShow  = canShow,
+    canInteract  = canInteract,
   })
 end
 

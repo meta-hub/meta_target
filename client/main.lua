@@ -608,6 +608,22 @@ function mTarget.addModelBone(id,title,icon,model,bone,radius,onSelect,items,var
   })
 end
 
+function mTarget.addBone(id,title,icon,bone,radius,onSelect,items,vars,res,canInteract)
+  addTarget({
+    id        = id,
+    type      = 'bone',
+    title     = title,
+    icon      = icon,
+    bone      = bone,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = res or GetInvokingResource(),
+    canInteract  = canInteract,
+  })
+end
+
 function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,vars,res,canInteract)
   local targetIds = {}
 

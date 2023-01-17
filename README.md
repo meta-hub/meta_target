@@ -152,20 +152,23 @@ anything    - any                 (literally any other data you want to pass thr
 ### point
 ```lua
   -- NOTE: This example uses a single event callback for the entire target
-
-  AddEventHandler('myscript:onInteract',function(targetData,itemData)
+  local function onSelect(targetData,itemData)
     print(targetData.name,targetData.label) --> my_shop_target  Shop
     print(itemData.name,itemData.label)     --> open_shop       Open Shop
-  end)
-
-  target.addPoint('my_shop_target', 'Shop', 'fas fa-home', vector3(123.4,456.7,789.0), 10.0, 'myscript:onInteract', {
+  end
+  
+  local function canInteract()
+    return true
+  end
+  
+  exports["meta_target"]:addPoint('my_shop_target', 'Shop', 'fas fa-home', vector3(123.4,456.7,789.0), 10.0, {
     {
       name = 'open_shop',
       label = 'Open Shop'
     }
-  },{
-    foo = 'bar'
-  })
+  }, {
+    foo = bar,
+  }, GetCurrentResourceName(), canInteract)
 ```
 
 ### model

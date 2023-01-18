@@ -11,8 +11,8 @@ Alternatively, calling the export by the same name works.
 Ensure [PolyZone](https://github.com/mkafrin/PolyZone) is installed.
 
 ## Control:
-The keybind to open the UI doesn't use a KeyMapping, it uses a set keybind inside the client/main.lua line 438
--- https://github.com/meta-hub/meta_target/blob/main/client/main.lua#L43
+The keybind to open the UI doesn't use a KeyMapping, it uses a set keybind inside the client/main.lua line 463
+-- https://github.com/meta-hub/meta_target/blob/main/client/main.lua#L463
 
 
 ## Referencing:

@@ -4,17 +4,6 @@
 Please report bugs, incorrect readme instructions/examples, or any other issue you might find, right here on github issues.  
 You can also post any missing features from other targetting resources that you would like added through github issues.
 
-## Installation:  
-Download the latest release of `meta_target`.  
-Add the `meta_target` resource to your `resources` folder, and add `start meta_target` to your server.cfg.  
-Alternatively, calling the export by the same name works.  
-Ensure [PolyZone](https://github.com/mkafrin/PolyZone) is installed.
-
-## Control:
-The keybind to open the UI doesn't use a KeyMapping, it uses a set keybind inside the client/main.lua line 463
--- https://github.com/meta-hub/meta_target/blob/main/client/main.lua#L463
-
-
 ## Referencing:
 
 Add the api to your resource fxmanifest.lua:

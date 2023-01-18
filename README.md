@@ -150,7 +150,7 @@ anything    - any                 (literally any other data you want to pass thr
     return true
   end
   
-  exports["meta_target"]:addPoint('my_shop_target', 'Shop', 'fas fa-home', vector3(123.4,456.7,789.0), 10.0, {
+  exports["meta_target"]:addPoint('my_shop_target', 'Shop', 'fas fa-home', vector3(123.4,456.7,789.0), 10.0, onSelect, {
     {
       name = 'open_shop',
       label = 'Open Shop'

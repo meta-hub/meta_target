@@ -626,6 +626,34 @@ anything    - any                 (literally any other data you want to pass thr
   })
 ```
 
+### vehicle
+```lua
+onSelect = function(targetData, itemData)
+  print(targetData.name,targetData.label) --> vehicle  Vehicle
+    print(itemData.name,itemData.label)   --> blow_up  Blow Up
+end
+
+-- without vars, resource and canInteract
+exports["meta_target"]:addVehicle("vehicle", "Vehicle", "fas fa-car", 2.5, onSelect, {
+  {
+    name = "blow_up",
+    label = "Blow Up"
+  }
+})
+
+-- with vars, resource, canInteract
+exports["meta_target"]:addVehicle("vehicle", "Vehicle", "fas fa-car", 2.5, onSelect, {
+  {
+    name = "blow_up",
+    label = "Blow Up"
+  }
+}, {
+  foo = "bar"
+}, GetCurrentResourceName(), function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+  return true
+end)
+```
+
 ### remove
 ```lua
   target.remove('pinkcage_target')

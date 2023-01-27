@@ -460,13 +460,19 @@ end
 
 Citizen.CreateThread(function()  
   local gameName      = GetGameName()
-  local control       = 37
-  local revealControl = 24
+  local control       = gameName == 'redm' and 0x580C4473 or 37
+  local revealControl = gameName == 'redm' and 0x07CE1E61 or 24
 
   while true do
     Wait(0)
 
-    DisableControlAction(0,control)
+    if gameName == 'redm' then
+      DisableControlAction(0,control)      
+      DisableControlAction(0,revealControl)
+      DisableControlAction(0,0x0F39B3D4)
+    else
+      DisableControlAction(0,control)
+    end
 
     if isOpen then
       DisablePlayerFiring(PlayerPedId(), true)

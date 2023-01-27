@@ -624,6 +624,20 @@ function mTarget.addBone(id,title,icon,bone,radius,onSelect,items,vars,res,canIn
   })
 end
 
+function mTarget.addBones(id,title,icon,bones,radius,onSelect,items,vars,res,canInteract)
+  local targetIds = {}
+
+  for i=1,#bones do
+    local targetId = id .. ":" .. i
+
+    mTarget.addBone(targetId,title,icon,bones[i],radius or Config.defaultRadius,onSelect,items,vars,res,canInteract)
+
+    table.insert(targetIds,targetId)
+  end
+
+  return table.unpack(targetIds)
+end
+
 function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,vars,res,canInteract)
   local targetIds = {}
 

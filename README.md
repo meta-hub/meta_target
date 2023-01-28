@@ -656,5 +656,5 @@ end)
 
 ### remove
 ```lua
-  target.remove('pinkcage_target')
+  target.removeTarget('pinkcage_target')
 ```

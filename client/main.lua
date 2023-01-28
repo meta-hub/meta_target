@@ -639,7 +639,7 @@ function mTarget.addBones(id,title,icon,bones,radius,onSelect,items,vars,res,can
 end
 
 function mTarget.addModelBones(id,title,icon,model,bones,radius,onSelect,items,vars,res,canInteract)
-  if type(models) ~= 'table' then models = {models} end
+  if type(model) ~= 'table' then model = {model} end
   local targetIds = {}
 
   for i=1,#bones do

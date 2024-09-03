@@ -4,13 +4,13 @@ local activeTargets = {}
 
 -- ui
 local isOpen
+local isDisable
 local cfgSent
 local uiFocus
 
 -- locals
-local plyPos = vec3(0,0,0)
 local endCoords = vec3(0,0,0)
-local entHit = 0
+local playerPed = PlayerPedId()
 
 -- exports
 local exportNames = {}
@@ -25,11 +25,21 @@ end
 
 local selectMethods = {
   ['function'] = function(t,...)
-    return t.onSelect(...)
+    local result
+    local arguments = {...}
+    pcall(function()
+      result = t.onSelect(table.unpack(arguments))
+    end)
+    return result
   end,
 
   ['table'] = function(t,...)
-    return t.onSelect(...)
+    local result
+    local arguments = {...}
+    pcall(function()
+      result = t.onSelect(table.unpack(arguments))
+    end)
+    return result
   end,
 
   ['string'] = function(t,...)
@@ -48,7 +58,11 @@ local typeChecks = {
     end
 
     if target.canInteract then
-      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      local canInteract = false
+      pcall(function()
+        canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      end)
+      return canInteract
     else
       return true
     end
@@ -68,7 +82,11 @@ local typeChecks = {
     end
 
     if target.canInteract then
-      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      local canInteract = false
+      pcall(function()
+        canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      end)
+      return canInteract
     else
       return true
     end
@@ -88,7 +106,11 @@ local typeChecks = {
     end
 
     if target.canInteract then
-      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      local canInteract = false
+      pcall(function()
+        canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      end)
+      return canInteract
     else
       return true
     end
@@ -110,23 +132,31 @@ local typeChecks = {
     end
 
     if target.canInteract then
-      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      local canInteract = false
+      pcall(function()
+        canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      end)
+      return canInteract
     else
       return true
     end
   end,
 
   ['polyZone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
-    if not target.isInside then
+    if target.radius and targetDist > target.radius then
       return false
     end
 
-    if targetDist > target.radius then
+    if not (type(target.isInside) ~= "function" and target.isInside or target.isInside()) then
       return false
     end
 
     if target.canInteract then
-      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      local canInteract = false
+      pcall(function()
+        canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      end)
+      return canInteract
     else
       return true
     end
@@ -150,7 +180,11 @@ local typeChecks = {
     end
 
     if target.canInteract then
-      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      local canInteract = false
+      pcall(function()
+        canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      end)
+      return canInteract
     else
       return true
     end
@@ -174,7 +208,11 @@ local typeChecks = {
     end
 
     if target.canInteract then
-      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      local canInteract = false
+      pcall(function()
+        canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      end)
+      return canInteract
     else
       return true
     end
@@ -201,12 +239,16 @@ local typeChecks = {
     end
 
     if target.canInteract then
-      return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      local canInteract = false
+      pcall(function()
+        canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+      end)
+      return canInteract
     else
       return true
     end
   end,
-  
+
   ['bone'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not ent then
       return false
@@ -225,7 +267,11 @@ local typeChecks = {
       end
 
       if target.canInteract then
-        return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+        local canInteract = false
+        pcall(function()
+          canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+        end)
+        return canInteract
       else
         return true
       end
@@ -250,7 +296,15 @@ local typeChecks = {
     end
 
     if entityType == 1 then
-      return true
+      if target.canInteract then
+        local canInteract = false
+        pcall(function()
+          canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+        end)
+        return canInteract
+      else
+        return true
+      end
     end
   end,
 
@@ -273,7 +327,11 @@ local typeChecks = {
 
     if entityType == 1 then
       if target.canInteract then
-        return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+        local canInteract = false
+        pcall(function()
+          canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+        end)
+        return canInteract
       else
         return true
       end
@@ -295,13 +353,17 @@ local typeChecks = {
 
     if entityType == 2 then
       if target.canInteract then
-        return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+        local canInteract = false
+        pcall(function()
+          canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+        end)
+        return canInteract
       else
         return true
       end
     end
   end,
-  
+
   ['object'] = function(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
     if not ent then
       return false
@@ -317,7 +379,11 @@ local typeChecks = {
 
     if entityType == 3 then
       if target.canInteract then
-        return target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+        local canInteract = false
+        pcall(function()
+          canInteract = target.canInteract(target,pos,ent,endPos,modelHash,isNetworked,netId,targetDist,entityType)
+        end)
+        return canInteract
       else
         return true
       end
@@ -344,30 +410,6 @@ local function sendUiConfig()
     type = 'config',
     colors = Config.colors
   })
-end
-
-local function openUi()
-  playerPed = PlayerPedId()
-  isOpen = true
-  activeTargets = {}
-
-  if not cfgSent then
-    sendUiConfig()
-  end
-
-  SendNUIMessage({
-    type = 'open'
-  })
-end
-
-local function closeUi()
-  isOpen = false
-
-  SendNUIMessage({
-    type = 'close'
-  })
-
-  SetNuiFocus(false,false)
 end
 
 local function cleanse(t)
@@ -403,8 +445,45 @@ local function isEntityValid(ent)
   return DoesEntityExist(ent)
 end
 
-local didChange = false
+local function deepcopy(orig, blacklistedKeys, blackListedTypes)
+  local orig_type = type(orig)
+  local copy
+  if not blackListedTypes or not blackListedTypes[orig_type] then
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+          if not blacklistedKeys or not blacklistedKeys[tostring(orig_key)] then
+            copy[deepcopy(orig_key, blacklistedKeys, blackListedTypes)] = deepcopy(orig_value, blacklistedKeys, blackListedTypes)
+          end
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig), blacklistedKeys, blackListedTypes))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+  end
+  return copy
+end
 
+local function table_matches(t1, t2)
+	local type1, type2 = type(t1), type(t2)
+
+	if type1 ~= type2 then return false end
+	if type1 ~= 'table' and type2 ~= 'table' then return t1 == t2 end
+
+	for k1,v1 in pairs(t1) do
+    local v2 = t2[k1]
+    if v2 == nil or not table_matches(v1,v2) then return false end
+	end
+
+	for k2,v2 in pairs(t2) do
+    local v1 = t1[k2]
+    if v1 == nil or not table_matches(v1,v2) then return false end
+	end
+
+	return true
+end
+
+local didChange = false
 local function checkActiveTargets()
   local pos = GetEntityCoords(playerPed)
   local hit,endPos,entityHit = s2w.get(-1,playerPed,0)
@@ -420,9 +499,7 @@ local function checkActiveTargets()
     end
   end
 
-  plyPos      = pos
   endCoords   = endPos
-  entHit      = entityHit
 
   local newTargets = {}
 
@@ -430,10 +507,55 @@ local function checkActiveTargets()
 
   for _,target in ipairs(targets) do
     if shouldTargetRender(target,pos,entityHit,endCoords,entityModel,isNetworked,netId,targetDist,entityType) then
-      table.insert(newTargets,target)
+      local newTarget = deepcopy(target, {
+        ["zoneHandel"] = true,
+        ["onInteract"] = true,
+        ["canInteract"] = true,
+      }, {
+        ["function"] = true,
+      })
+      local itemStates = {}
+      for i = #newTarget.items,1,-1 do
+        local v = newTarget.items[i]
+        local canInteractFunc = target.items[i].canInteract
+        newTarget.items[i].ui_temp_index = i - 1
+        if v and canInteractFunc then
+          local canInteract = false
+          pcall(function()
+            canInteract = canInteractFunc(target,v,pos,entityHit,endCoords,entityModel,isNetworked,netId,targetDist,entityType)
+          end)
+          if not canInteract then
+            table.remove(newTarget.items,i)
+            itemStates[i] = false
+          else
+            itemStates[i] = true
+          end
+          v.canInteract = nil
+        end
+      end
 
-      if not activeTargets[target.id] then
-        activeTargets[target.id] = true
+      if #newTarget.items > 0 then
+        table.insert(newTargets,newTarget)
+        if not activeTargets[target.id] then
+          activeTargets[target.id] = {
+            target = target,
+            pos = pos,
+            entityHit = entityHit,
+            endPos = endPos,
+            entityModel = entityModel,
+            isNetworked = isNetworked,
+            netId = netId,
+            targetDist = targetDist,
+            entityType = entityType,
+            itemStates = itemStates,
+          }
+          didChange = true
+        elseif not table_matches(activeTargets[target.id].itemStates,itemStates) then
+          activeTargets[target.id].itemStates = itemStates
+          didChange = true
+        end
+      elseif activeTargets[target.id] then
+        activeTargets[target.id] = nil
         didChange = true
       end
     else
@@ -458,42 +580,83 @@ local function targetUi()
   uiFocus = true
 end
 
-Citizen.CreateThread(function()  
+local checkActiveThreadBool = false
+local checkActiveThread = function()
+  if checkActiveThreadBool then
+    return
+  end
+  checkActiveThreadBool = true
+  CreateThread(function()
+    while isOpen do
+      Wait(100)
+      checkActiveTargets()
+    end
+    checkActiveThreadBool = false
+  end)
+end
+
+local function openUi()
+  isOpen = true
+  checkActiveThread()
+  activeTargets = {}
+
+  if not cfgSent then
+    sendUiConfig()
+  end
+
+  SendNUIMessage({
+    type = 'open'
+  })
+end
+
+local function closeUi()
+  isOpen = false
+
+  SendNUIMessage({
+    type = 'close'
+  })
+
+  SetNuiFocus(false,false)
+end
+
+lib.onCache('ped', function(value)
+  playerPed = value
+end)
+
+Citizen.CreateThread(function()
   local gameName      = GetGameName()
-  local control       = gameName == 'redm' and 0x580C4473 or 37
+  local control       = gameName == 'redm' and 0x580C4473 or 19
   local revealControl = gameName == 'redm' and 0x07CE1E61 or 24
+  if gameName == 'redm' then
+    lib.disableControls:Add({control,revealControl,0x0F39B3D4})
+  else
+    lib.disableControls:Add({control})
+  end
 
   while true do
-    Wait(0)
+    Wait(5)
 
-    if gameName == 'redm' then
-      DisableControlAction(0,control)      
-      DisableControlAction(0,revealControl)
-      DisableControlAction(0,0x0F39B3D4)
-    else
-      DisableControlAction(0,control)
-    end
+    lib.disableControls()
 
     if isOpen then
-      DisablePlayerFiring(PlayerPedId(), true)
-      checkActiveTargets()
+      DisablePlayerFiring(playerPed, true)
 
-      if IsDisabledControlJustReleased(0,revealControl)
-      or IsControlJustReleased(0,revealControl)  
+      if not isDisable
+      and (IsDisabledControlJustReleased(0,revealControl)
+      or IsControlJustReleased(0,revealControl))
       then
         targetUi()
       end
 
       if not uiFocus then
-        if IsDisabledControlJustReleased(0,control)
-        or IsControlJustReleased(0,control) 
+        if isDisable
+        or IsDisabledControlJustReleased(0,control)
         then
           closeUi()
         end
       end
-    else
+    elseif not isDisable then
       if IsDisabledControlJustPressed(0,control)
-      or IsControlJustPressed(0,control) 
       then
         openUi()
       end
@@ -503,28 +666,22 @@ end)
 
 RegisterNUICallback('closed',function()
   uiFocus = false
-  isOpen  = false
+  isOpen = false
   SetNuiFocus(false,false)
 end)
 
 RegisterNUICallback('select',function(data)
   data.id     = data.id
   data.index  = tonumber(data.index)+1
-  
-  local isActive = activeTargets[data.id]
 
-  if not isActive then
+  local targetData = activeTargets[data.id]
+
+  if not targetData then
     return
   end
 
-  local target
-
-  for _,t in ipairs(targets) do
-    if t.id == data.id then
-      target = t
-      break
-    end
-  end
+  local entHit = targetData.entityHit or false
+  local target = targetData.target
 
   if not target then
     return
@@ -535,12 +692,12 @@ RegisterNUICallback('select',function(data)
   if not option then
     return
   end
-  
+
   uiFocus = false
-  isOpen  = false
+  isOpen = false
   SetNuiFocus(false,false)
 
-  onSelect(target,option,entHit)
+  onSelect(target,option,entHit,targetData)
 end)
 
 local function addTarget(target)
@@ -549,14 +706,25 @@ end
 
 mTarget = {}
 
+function mTarget.disableTargeting(state)
+  isDisable = state
+  if isOpen then
+    closeUi()
+  end
+end
+
 function mTarget.removeTarget(...)
   for i=1,select("#",...),1 do
     local id = select(i,...)
-    
+
     for i=#targets,1,-1 do
       if targets[i].id == id then
-        if targets[i].zoneHandel and targets[i].zoneHandel.destroy then
-          targets[i].zoneHandel:destroy()
+        if targets[i].zoneHandel then
+          if Config.zoneCreatorCore == "PolyZone" and targets[i].zoneHandel.destroy then
+            targets[i].zoneHandel:destroy()
+          elseif Config.zoneCreatorCore == "ox_lib" and targets[i].zoneHandel.remove then
+            targets[i].zoneHandel:remove()
+          end
         end
         table.remove(targets,i)
       end
@@ -565,6 +733,79 @@ function mTarget.removeTarget(...)
     if activeTargets[id] then
       activeTargets[id] = nil
       didChange = true
+    end
+  end
+end
+
+function mTarget.removeItemFromTarget(id,...)
+  local tableIndexes = {...}
+  local fullyRemoved = false
+  local newItems = {}
+  table.sort(tableIndexes, function(a,b) return a > b end)
+  for i=#targets,1,-1 do
+    if targets[i].id == id then
+      for _,index in ipairs(tableIndexes) do
+        table.remove(targets[i].items,index)
+      end
+      if #targets[i].items == 0 then
+        if targets[i].zoneHandel then
+          if Config.zoneCreatorCore == "PolyZone" and targets[i].zoneHandel.destroy then
+            targets[i].zoneHandel:destroy()
+          elseif Config.zoneCreatorCore == "ox_lib" and targets[i].zoneHandel.remove then
+            targets[i].zoneHandel:remove()
+          end
+        end
+        table.remove(targets,i)
+        fullyRemoved = true
+      end
+      if not fullyRemoved then
+        newItems = targets[i].items
+      end
+      if activeTargets[id] then
+        CreateThread(checkActiveTargets)
+      end
+    end
+  end
+  return fullyRemoved,newItems
+end
+
+function mTarget.getTargetInfo(...)
+  local results = {}
+  for i=1,select("#",...),1 do
+    local id = select(i,...)
+    for i=#targets,1,-1 do
+      if targets[i].id == id then
+        table.insert(results,targets[i])
+      end
+    end
+  end
+  return results
+end
+
+function mTarget.getTargetByType(type)
+  local results = {}
+  for i=1,#targets,1 do
+    if targets[i].type == type then
+      table.insert(results,targets[i])
+    end
+  end
+  return results
+end
+
+function mTarget.getTargets()
+  return targets
+end
+
+function mTarget.getActiveTargets()
+  return activeTargets
+end
+
+function mTarget.updateTargetInfo(id,info)
+  for i=1,#targets,1 do
+    if targets[i].id == id then
+      for k,v in pairs(info) do
+        targets[i][k] = v
+      end
     end
   end
 end
@@ -729,14 +970,37 @@ function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,it
     canInteract  = canInteract,
   }
 
-  local polyZone = PolyZone:Create(points,options)
-  target.zoneHandel = polyZone
-
-  polyZone:onPointInOut(getEndCoords,function(isPointInside,point)
-    target.isInside = isPointInside
-  end,500)
+  local polyZone
+  local isDebug = options and (options.debug or options.debugPoly or options.drawSprite) or false
+  if Config.zoneCreatorCore == 'PolyZone' then
+    polyZone = PolyZone:Create(points,options)
+    target.zoneHandel = polyZone
+    target.isInside = function()
+      return polyZone:isPointInside(getEndCoords())
+    end
+  else
+    local thickness = 99999.0
+    if options and options.minZ and options.maxZ then
+      thickness = math.abs(options.maxZ - options.minZ)
+    end
+    local newPoints = {}
+    for i=1,#points do
+      table.insert(newPoints,vector3(points[i].x,points[i].y,(options.maxZ and options.maxZ - (thickness / 2)) or 0.0))
+    end
+    polyZone = lib.zones.poly({
+      points = newPoints,
+      thickness = thickness,
+      debug = isDebug,
+      options = options,
+    })
+    target.zoneHandel = polyZone
+    target.isInside = function()
+      return polyZone:contains(getEndCoords())
+    end
+  end
 
   addTarget(target)
+  return polyZone
 end
 
 function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars,res,canInteract)
@@ -755,12 +1019,12 @@ function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars,res,ca
 
   addTarget(target)
 
-  return function(isInside)    
+  return function(isInside)
     target.isInside = isInside
   end
 end
 
-function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,radius,onSelect,items,vars,res,canInteract)    
+function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,radius,onSelect,items,vars,res,canInteract)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -774,14 +1038,34 @@ function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,ra
     canInteract  = canInteract,
   }
 
-  local boxZone = BoxZone:Create(center,length,width,options)
-  target.zoneHandel = boxZone
+  local boxZone
+  local isDebug = options and (options.debug or options.debugPoly or options.drawSprite) or false
+  if Config.zoneCreatorCore == 'PolyZone' then
+    boxZone = BoxZone:Create(center,length,width,options)
+    target.zoneHandel = boxZone
+    target.isInside = function()
+      return boxZone:isPointInside(getEndCoords())
+    end
+  else
+    local height = 99999.0
+    if options and options.minZ and options.maxZ then
+      height = math.abs(options.maxZ - options.minZ)
+    end
+    boxZone = lib.zones.box({
+      coords = center,
+      size = vector3(length,width,height),
+      rotation = options and options.heading or 0.0,
+      debug = isDebug,
+    })
+    target.zoneHandel = boxZone
+    target.isInside = function()
+      return boxZone:contains(getEndCoords())
+    end
+  end
 
-  boxZone:onPointInOut(getEndCoords,function(isPointInside,point)
-    target.isInside = isPointInside
-  end,500)
 
   addTarget(target)
+  return boxZone
 end
 
 function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars,res,canInteract)
@@ -791,6 +1075,7 @@ function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars,res
     title     = title,
     icon      = icon,
     radius    = radius or Config.defaultRadius,
+    radius    = radius,
     onSelect  = onSelect,
     items     = items,
     vars      = vars,
@@ -800,7 +1085,67 @@ function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars,res
 
   addTarget(target)
 
-  return function(isInside)    
+  return function(isInside)
+    target.isInside = isInside
+  end
+end
+
+function mTarget.addInternalSphereZone(id,title,icon,center,sphereRadius,options,radius,onSelect,items,vars,res,canInteract)
+  local target = {
+    id        = id,
+    type      = 'polyZone',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = res or GetInvokingResource(),
+    canInteract  = canInteract,
+  }
+
+  local isDebug = options and (options.debug or options.debugPoly or options.drawSprite) or false
+  local circleZone
+  if Config.zoneCreatorCore == 'PolyZone' then
+    circleZone = CircleZone:Create(center,sphereRadius,options)
+    target.zoneHandel = circleZone
+    target.isInside = function()
+      return circleZone:isPointInside(getEndCoords())
+    end
+  else
+    circleZone = lib.zones.sphere({
+      coords = center,
+      radius  = sphereRadius,
+      debug = isDebug,
+    })
+    target.zoneHandel = circleZone
+    target.isInside = function()
+      return circleZone:contains(getEndCoords())
+    end
+  end
+
+
+  addTarget(target)
+  return circleZone
+end
+
+function mTarget.addExternalSphereone(id,title,icon,radius,onSelect,items,vars,res,canInteract)
+  local target = {
+    id        = id,
+    type      = 'polyZone',
+    title     = title,
+    icon      = icon,
+    radius    = radius or Config.defaultRadius,
+    onSelect  = onSelect,
+    items     = items,
+    vars      = vars,
+    resource  = res or GetInvokingResource(),
+    canInteract  = canInteract,
+  }
+
+  addTarget(target)
+
+  return function(isInside)
     target.isInside = isInside
   end
 end
@@ -944,8 +1289,12 @@ exports('getExportNames',getExportNames)
 AddEventHandler('onClientResourceStop',function(res)
   for i=#targets,1,-1 do
     if targets[i].resource == res then
-      if targets[i].zoneHandel and targets[i].zoneHandel.destroy then
-        targets[i].zoneHandel:destroy()
+      if targets[i].zoneHandel then
+        if Config.zoneCreatorCore == "PolyZone" and targets[i].zoneHandel.destroy then
+          targets[i].zoneHandel:destroy()
+        elseif Config.zoneCreatorCore == "ox_lib" and targets[i].zoneHandel.remove then
+          targets[i].zoneHandel:remove()
+        end
       end
       table.remove(targets,i)
     end

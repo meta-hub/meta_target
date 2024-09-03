@@ -128,7 +128,7 @@
   <div id='bg' onclick='closeFrame()'></div>
 
   <div id='container'>
-    <div id='eye' class='eye active fas fa-eye'></div>
+    <div id='eye' class='eye active fa-light fa-eye'></div>
 
     <div id='elements'>
       <div class='item'>
@@ -202,6 +202,7 @@
         for (let j=0;j<target.items.length;j++) {
           const index = j
           const item = target.items[index]
+          const callingIndex = item.ui_temp_index || index
 
           const label = createEle('DIV','label',items)
           label.textContent = item.label
@@ -209,7 +210,7 @@
           label.onclick = function() {
             const payload = {
               id:target.id,
-              index:index
+              index:callingIndex
             }
 
             $.post(`https://${GetParentResourceName()}/select`,JSON.stringify(payload))
@@ -242,7 +243,7 @@
         break
 
         case 'close':
-          document.body.style.opacity = 0
+          closeFrame()
         break
       }
     })

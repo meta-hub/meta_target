@@ -4,7 +4,7 @@ local rotationToDirection = function(rotation)
   local num = math.abs(math.cos(x))
   return vector3((-math.sin(z) * num), (math.cos(z) * num), math.sin(x))
 end
- 
+
 local world3DToScreen2D = function(pos)
   local _, sX, sY = GetScreenCoordFromWorldCoord(pos.x, pos.y, pos.z)
   return vector2(sX, sY)
@@ -43,11 +43,11 @@ local function screenToWorldAsync(flag,ent,col,camRot,camPos,posX,posY)
   local direction = camPos + (forwardDir * 100.0)
 
   local rayHandle = Citizen.InvokeNative(
-    '0x7EE9F5D83DD4F90E', 
-    cam3DPos.x,cam3DPos.y,cam3DPos.z, 
-    direction.x,direction.y,direction.z, 
-    flag or -1, 
-    ent or 0, 
+    '0x7EE9F5D83DD4F90E',
+    cam3DPos.x,cam3DPos.y,cam3DPos.z,
+    direction.x,direction.y,direction.z,
+    flag or -1,
+    ent or 0,
     col or 4
   )
 
@@ -72,11 +72,11 @@ local function screenToWorld(flag,ent,col,camRot,camPos,posX,posY)
   local direction = camPos + (forwardDir * 100.0)
 
   local rayHandle = Citizen.InvokeNative(
-    '0x377906D8A31E5586', 
-    cam3DPos.x,cam3DPos.y,cam3DPos.z, 
-    direction.x,direction.y,direction.z, 
-    flag or -1, 
-    ent or 0, 
+    '0x377906D8A31E5586',
+    cam3DPos.x,cam3DPos.y,cam3DPos.z,
+    direction.x,direction.y,direction.z,
+    flag or -1,
+    ent or 0,
     col or 4
   )
 

@@ -720,10 +720,10 @@ function mTarget.removeTarget(...)
     for i=#targets,1,-1 do
       if targets[i].id == id then
         if targets[i].zoneHandel then
-          if Config.zoneCreatorCore == "PolyZone" and targets[i].zoneHandel.destroy then
-            targets[i].zoneHandel:destroy()
-          elseif Config.zoneCreatorCore == "ox_lib" and targets[i].zoneHandel.remove then
+          if targets[i].zoneCreatorCore == "ox_lib" and targets[i].zoneHandel.remove then
             targets[i].zoneHandel:remove()
+          elseif targets[i].zoneHandel.destroy then
+            targets[i].zoneHandel:destroy()
           end
         end
         table.remove(targets,i)
@@ -749,10 +749,10 @@ function mTarget.removeItemFromTarget(id,...)
       end
       if #targets[i].items == 0 then
         if targets[i].zoneHandel then
-          if Config.zoneCreatorCore == "PolyZone" and targets[i].zoneHandel.destroy then
-            targets[i].zoneHandel:destroy()
-          elseif Config.zoneCreatorCore == "ox_lib" and targets[i].zoneHandel.remove then
+          if targets[i].zoneCreatorCore == "ox_lib" and targets[i].zoneHandel.remove then
             targets[i].zoneHandel:remove()
+          elseif targets[i].zoneHandel.destroy then
+            targets[i].zoneHandel:destroy()
           end
         end
         table.remove(targets,i)
@@ -956,7 +956,7 @@ function mTarget.addLocalEnt(id,title,icon,entId,radius,onSelect,items,vars,res,
   })
 end
 
-function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,items,vars,res,canInteract)
+function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,items,vars,res,canInteract,zoneCreatorCore)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -968,17 +968,12 @@ function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,it
     vars      = vars,
     resource  = res or GetInvokingResource(),
     canInteract  = canInteract,
+    zoneCreatorCore = zoneCreatorCore
   }
 
   local polyZone
   local isDebug = options and (options.debug or options.debugPoly or options.drawSprite) or false
-  if Config.zoneCreatorCore == 'PolyZone' then
-    polyZone = PolyZone:Create(points,options)
-    target.zoneHandel = polyZone
-    target.isInside = function()
-      return polyZone:isPointInside(getEndCoords())
-    end
-  else
+  if zoneCreatorCore == 'ox_lib' then
     local thickness = 99999.0
     if options and options.minZ and options.maxZ then
       thickness = math.abs(options.maxZ - options.minZ)
@@ -996,6 +991,12 @@ function mTarget.addInternalPoly(id,title,icon,points,options,radius,onSelect,it
     target.zoneHandel = polyZone
     target.isInside = function()
       return polyZone:contains(getEndCoords())
+    end
+  else
+    polyZone = PolyZone:Create(points,options)
+    target.zoneHandel = polyZone
+    target.isInside = function()
+      return polyZone:isPointInside(getEndCoords())
     end
   end
 
@@ -1024,7 +1025,7 @@ function mTarget.addExternalPoly(id,title,icon,radius,onSelect,items,vars,res,ca
   end
 end
 
-function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,radius,onSelect,items,vars,res,canInteract)
+function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,radius,onSelect,items,vars,res,canInteract,zoneCreatorCore)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -1036,17 +1037,12 @@ function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,ra
     vars      = vars,
     resource  = res or GetInvokingResource(),
     canInteract  = canInteract,
+    zoneCreatorCore = zoneCreatorCore
   }
 
   local boxZone
   local isDebug = options and (options.debug or options.debugPoly or options.drawSprite) or false
-  if Config.zoneCreatorCore == 'PolyZone' then
-    boxZone = BoxZone:Create(center,length,width,options)
-    target.zoneHandel = boxZone
-    target.isInside = function()
-      return boxZone:isPointInside(getEndCoords())
-    end
-  else
+  if zoneCreatorCore == 'ox_lib' then
     local height = 99999.0
     if options and options.minZ and options.maxZ then
       height = math.abs(options.maxZ - options.minZ)
@@ -1060,6 +1056,12 @@ function mTarget.addInternalBoxZone(id,title,icon,center,length,width,options,ra
     target.zoneHandel = boxZone
     target.isInside = function()
       return boxZone:contains(getEndCoords())
+    end
+  else
+    boxZone = BoxZone:Create(center,length,width,options)
+    target.zoneHandel = boxZone
+    target.isInside = function()
+      return boxZone:isPointInside(getEndCoords())
     end
   end
 
@@ -1090,7 +1092,7 @@ function mTarget.addExternalBoxZone(id,title,icon,radius,onSelect,items,vars,res
   end
 end
 
-function mTarget.addInternalSphereZone(id,title,icon,center,sphereRadius,options,radius,onSelect,items,vars,res,canInteract)
+function mTarget.addInternalSphereZone(id,title,icon,center,sphereRadius,options,radius,onSelect,items,vars,res,canInteract,zoneCreatorCore)
   local target = {
     id        = id,
     type      = 'polyZone',
@@ -1102,17 +1104,12 @@ function mTarget.addInternalSphereZone(id,title,icon,center,sphereRadius,options
     vars      = vars,
     resource  = res or GetInvokingResource(),
     canInteract  = canInteract,
+    zoneCreatorCore = zoneCreatorCore
   }
 
   local isDebug = options and (options.debug or options.debugPoly or options.drawSprite) or false
   local circleZone
-  if Config.zoneCreatorCore == 'PolyZone' then
-    circleZone = CircleZone:Create(center,sphereRadius,options)
-    target.zoneHandel = circleZone
-    target.isInside = function()
-      return circleZone:isPointInside(getEndCoords())
-    end
-  else
+  if zoneCreatorCore == 'ox_lib' then
     circleZone = lib.zones.sphere({
       coords = center,
       radius  = sphereRadius,
@@ -1121,6 +1118,12 @@ function mTarget.addInternalSphereZone(id,title,icon,center,sphereRadius,options
     target.zoneHandel = circleZone
     target.isInside = function()
       return circleZone:contains(getEndCoords())
+    end
+  else
+    circleZone = CircleZone:Create(center,sphereRadius,options)
+    target.zoneHandel = circleZone
+    target.isInside = function()
+      return circleZone:isPointInside(getEndCoords())
     end
   end
 
@@ -1290,10 +1293,10 @@ AddEventHandler('onClientResourceStop',function(res)
   for i=#targets,1,-1 do
     if targets[i].resource == res then
       if targets[i].zoneHandel then
-        if Config.zoneCreatorCore == "PolyZone" and targets[i].zoneHandel.destroy then
-          targets[i].zoneHandel:destroy()
-        elseif Config.zoneCreatorCore == "ox_lib" and targets[i].zoneHandel.remove then
+        if targets[i].zoneCreatorCore == "ox_lib" and targets[i].zoneHandel.remove then
           targets[i].zoneHandel:remove()
+        elseif targets[i].zoneHandel.destroy then
+          targets[i].zoneHandel:destroy()
         end
       end
       table.remove(targets,i)

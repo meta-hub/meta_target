@@ -930,8 +930,8 @@ local exports = {
       end
     end
 
-    local zoneHanel = mTarget.addInternalSphereZone(name,targetOptions[1].label or name:upper(),targetOptions[1].icon,parameters.coords,parameters.radius,parameters,parameters.range or parameters.radius or false,NewFunction,items,{},GetInvokingResource(),targetOptions.canInteract)
-    return zoneHanel.id
+    local zoneHandel = mTarget.addInternalSphereZone(name,targetOptions[1].label or name:upper(),targetOptions[1].icon,parameters.coords,parameters.radius,parameters,parameters.range or parameters.radius or false,NewFunction,items,{},GetInvokingResource(),targetOptions.canInteract,"ox_lib")
+    return zoneHandel.id
   end,
 
   addBoxZone = function(parameters)
@@ -1017,8 +1017,8 @@ local exports = {
     parameters.maxZ = maxZ
     parameters.minZ = minZ
 
-    local zoneHanel = mTarget.addInternalBoxZone(name,targetOptions[1].label or name:upper(),targetOptions[1].icon,parameters.coords,length,width,parameters,parameters.radius or false,NewFunction,items,{},GetInvokingResource(),targetOptions.canInteract)
-    return zoneHanel.id
+    local zoneHandel = mTarget.addInternalBoxZone(name,targetOptions[1].label or name:upper(),targetOptions[1].icon,parameters.coords,length,width,parameters,parameters.radius or false,NewFunction,items,{},GetInvokingResource(),targetOptions.canInteract,"ox_lib")
+    return zoneHandel.id
   end,
 
   addPolyZone = function(parameters)
@@ -1111,8 +1111,8 @@ local exports = {
     parameters.maxZ = maxZ + (thickness / 2)
     parameters.minZ = minZ - (thickness / 2)
     
-    local zoneHanel = mTarget.addInternalPoly(name,targetOptions[1].label or name:upper(),targetOptions[1].icon,parameters.points,parameters,parameters.radius or false,NewFunction,items,{},GetInvokingResource(),targetOptions.canInteract)
-    return zoneHanel.id
+    local zoneHandel = mTarget.addInternalPoly(name,targetOptions[1].label or name:upper(),targetOptions[1].icon,parameters.points,parameters,parameters.radius or false,NewFunction,items,{},GetInvokingResource(),targetOptions.canInteract,"ox_lib")
+    return zoneHandel.id
   end,
 
   removeGlobalObject = function(optionNames)
